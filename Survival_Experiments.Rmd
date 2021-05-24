@@ -1,0 +1,376 @@
+---
+title: "Survival Experiments"
+author: "Abigail  Wukitch"
+date: "1/21/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("C:/Users/amw03/Desktop/Research/extremes")
+```
+
+Here is a beautiful R markdown file of all of the double injection experiments preformed the Chambers Lab from 2018 to the present (2020)
+
+Scientists include Frank and Abby
+Mentor: Dr. Moria Chambers
+Fly strain: Caston S *Drosophilia melanogaster*
+Bacterial strains: *Providencia rettgeri*, *Serratia marcescens*, *Enteroccous faecalis*, and *Providencia sneebia*
+All raw data can be found on google drive: https://docs.google.com/spreadsheets/d/1fmrq0qabwmag9lypaudlYYu3VMj35brP14ng4a-AXZI/edit?usp=sharing
+and https://docs.google.com/spreadsheets/d/1Q9BK3ZiV3eoYoraTOYGwlGqF0pu0A5c6vSomI7J1JPg/edit#gid=0
+
+#The Experiments
+
+**E.fae-P.rett**
+Scientists: Abby and Frank
+Dates: 6/18/18, 6/20/18, 6/22/18, 6/25/18, 7/19/18, 7/23/18, 6/4/19, 6/5/19, 6/11/19, 7/1/19, 7/3/19
+Replicate names: 1, 2, 3, 4, 10-Sept, 10, I, II, III, IV, and V
+
+**S.m-P.rett**
+Scientists: Abby and Frank
+Dates: 6/28/18, 7/10/18, 8/1/18, 8/2/18, 8/6/18, 6/14/19, 6/17/19, 6/19/19, 6/25/19, 6/27/19
+Replicate names: 5, 9-Aug, 11, 12, 13, I, II, III, IV, V
+Note: does not include extreme experiments
+
+**P.rett extremes**
+Scientist: Abby
+Dates: 1/30/20, 2/13/20, 9/27/20, 10/6/20, 10/15/20, 11/1/20
+Replicate names: SM-P.rett_1, SM_P.rett_2, Fall 2020 exp 1, Fall 2020 exp 3, Fall 2020 exp 5, Fall 2020 exp 10 
+
+**P.snee extremes**
+Scientist: Abby
+Dates: 2/7/20, 2/21/20, 10/1/20, 10/10/20, 10/24/20
+Replicate names: SM-P.sneebia_1, SM-sneebia_2, Fall 2020 exp 2, Fall 2020 exp 4, Fall 2020 exp 8
+
+**Varied primary injection dose**
+Scientist: Abby
+Dates: 10/18/20, 10/20/20, 10/29/20, 11/3/20, 11/7/20, 11/28/20, 11/30/20, 12/04/20
+Replicate names: Fall 2020 exp 6, Fall 2020 exp 7, Fall 2020 exp 9, Fall 2020 exp 11, Fall 2020 exp 12, Fall 2020 exp 13, Fall 2020 exp 14, Fall 2020 exp 16
+
+```{r, load and organise data}
+library(survival)
+library(RColorBrewer)
+library(ggplot2)
+library(dplyr)
+
+rm(list=ls()) #removes all old variables
+
+all_data = read.csv("All_data.csv")
+#date is always a way to uniquely refer to an experiment
+#replicate names where often added in later and sometimes repeat
+#fall 2020 experiments tried to address this
+
+extreme_data = read.csv("Fall 2020 Summary - all data.csv")
+#contains all the extreme data and data for varied primary injection dose
+
+#E.fae-P.rett experiments
+E.fae_P.rett = subset(all_data, date == "6/18/18" | date == "6/20/18" | date == "6/22/18" | date == "6/25/18" | date == "7/19/18" | date == "7/23/18" | date == "6/4/19" | date == "6/5/19" | date == "6/11/19" | date == "7/1/19" | date == "7/3/19")
+
+#S.m-P.rett experiments (not including extremes)
+S.m_P.rett = subset(all_data, date == "6/28/18" | date == "7/10/18" | date == "8/1/18" | date == "8/2/18" | date == "8/6/18" | date == "6/14/19" | date == "6/17/19" | date == "6/25/19" | date == "6/27/19")
+
+#P.rett extremes
+P.rett_extremes = subset(extreme_data, rep == "SM-P.rett_1" | rep == "SM-P.rett2" | rep == "Fall 2020 exp 1" | rep == "Fall 2020 exp 3" | rep == "Fall 2020 exp 5" | rep == "Fall 2020 exp 10")
+
+#P.snee extremes
+P.snee_extremes = subset(extreme_data, rep == "SM-sneebia_1" | rep == "SM-sneebia_2" | rep == "Fall 2020 exp 2" | rep == "Fall 2020 exp 4" | rep == "Fall 2020 exp 8")
+
+#Varied primary dose
+Varied_primary = subset(extreme_data, rep == "Fall 2020 exp 6" | rep == "Fall 2020 exp 7" | rep == "Fall 2020 exp 9" | rep == "Fall 2020 exp 11" | rep == "Fall 2020 exp 12" | rep == "Fall 2020 exp 13" | rep == "Fall 2020 exp 14" | rep == "Fall 2020 exp 16")
+
+#varied primary with P.snee
+P.snee_varied_primary = read.csv("Spring 2021 Summary.csv")
+```
+```{r, spring 2021}
+
+extreme_data = read.csv("fly_data.csv")
+
+table(extreme_data$primary_dose, extreme_data$secondary)
+
+#png(file="extreme_data.png",width=1200,height=1200,res=130)
+plot(survfit(Surv(extreme_data$hour,extreme_data$status)~extreme_data$primary_dose+extreme_data$secondary),col=c("gray", "gray", "#c2f0c2", "#85e085", "#33cc33", "#248f24", "#145214"),lty=c(1, 3, 1, 1, 1, 1, 1),lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="hours post-secondary infection", cex.lab=1.5, xlim=c(10, 46))
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+legend("bottomleft",inset=0.02, bty="n" , c("PBS-P.snee 0.001", "PBS-PBS", "S.m 0.001-P.snee 0.001", "S.m 0.01-P.snee 0.001", "S.m 0.1-P.snee 0.001", "S.m 1.0-P.snee 0.001", "S.m 2.0-P.snee 0.001"),col=c("gray", "gray", "#c2f0c2", "#85e085", "#33cc33", "#248f24", "#145214"),lty=c(1, 3, 1, 1, 1, 1, 1),lwd=5, cex=1)
+
+```
+
+
+
+**E.fae-P.rett Experiments**
+
+```{r, E.fae-P.rett Experiments}
+#probably actually will cut two of the conditions since only one replicate used them and there aren't many flies but for now fix as stated above
+
+table(E.fae_P.rett$primary, E.fae_P.rett$X2_dose)
+
+#png(file="E.fae-P.rett.png",width=1200,height=1200,res=130)
+plot(survfit(Surv(E.fae_P.rett$day,E.fae_P.rett$status)~E.fae_P.rett$primary+E.fae_P.rett$X2_dose),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black", 'gray', '#cdc673'),lty=c(1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3),lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5)
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+#legend("topright", bty="n" , c("E.fae-P.rett 0.001", "E.fae-P.rett 0.01", "E.fae-P.rett 0.05", "E.fae-P.rett 0.1", 'E.fae-P.rett 0.5', "E.fae-P.rett 1.0", 'E.fae-P.rett 2.0', "PBS-P.rett 0.001", "PBS-P.rett 0.01", "PBS-P.rett 0.05", "PBS-P.rett 0.1", "PBS-P.rett 0.5", 'PBS-P.rett 1.0', 'PBS-P.rett 2.0'),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black", 'gray', '#cdc673'),lty=c(1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3),lwd=5, cex=1) #a plot for fun
+#dev.off()
+
+```
+
+
+
+**S.m-P.rett Experiments**
+extremes not included
+individual replicates not included
+```{r, S.m-P.rett experiments, excluding extremes}
+
+table(S.m_P.rett$primary, S.m_P.rett$X2_dose)
+#png(file="S.m-P.rett.png",width=1200,height=1200,res=130)
+plot(survfit(Surv(S.m_P.rett$day,S.m_P.rett$status)~S.m_P.rett$primary+S.m_P.rett$X2_dose),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black"),lty=c(1, 1, 1, 1, 1, 3, 3, 3, 3, 3),lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5)
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+#legend("topright",inset=0.02, bty="n" , c("PBS-P.rett 0.001", "PBS-P.rett 0.01", "PBS-P.rett 0.1", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "S.m-P.rett 0.001", "S.m-P.rett 0.01", "S.m-P.rett 0.1", "S.m-P.rett 1.0", "S.m-P.rett 2.0"),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black"),lty=c(1, 1, 1, 1, 1, 3, 3, 3, 3, 3),lwd=5, cex=1) #a plot for fun
+#dev.off()
+
+```
+**P.rett Extreme Experiments**
+```{r, P.rett extreme experiments}
+table(P.rett_extremes$primary, P.rett_extremes$secondary_dose)
+#png(file="P.rett_extremes.png",width=1200,height=1200,res=130)
+plot(survfit(Surv(P.rett_extremes$day,P.rett_extremes$status)~P.rett_extremes$primary+P.rett_extremes$secondary_dose),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black"),lty=c(1, 1, 1, 1, 1, 3, 3, 3, 3, 3),lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(0,7))
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+#legend("topright",inset=0.02, bty="n" , c("PBS-P.rett 0.1", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "PBS-P.rett 3.0", "PBS-P.rett 5.0", "S.m-P.rett 0.1", "S.m-P.rett 1.0", "S.m-P.rett 2.0", "S.m-P.rett 3.0", "S.m-P.rett 5.0"),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black"),lty=c(1, 1, 1, 1, 1, 3, 3, 3, 3, 3),lwd=5, cex=1) #a plot for fun
+#dev.off()
+
+```
+
+Individual Replicates
+```{r, P.rett extreme experiments individual replicates}
+
+#Individual replicates
+
+#SM-P.rett 1
+SM_P.rett_1 = subset(P.rett_extremes, rep == 'SM-P.rett_1')
+plot(survfit(Surv(SM_P.rett_1$day,SM_P.rett_1$status)~SM_P.rett_1$primary+SM_P.rett_1$secondary_dose),col=c("#a6dba0", "#1b7837", "#af8dc3", "black"),lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(0,7))
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+#legend("topright",inset=0.02, bty="n" , c("PBS-P.rett 0.1", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "PBS-P.rett 5.0", "S.m-P.rett 0.1", "S.m-P.rett 1.0", "S.m-P.rett 2.0", "S.m-P.rett 5.0"),col=c("#a6dba0", "#1b7837", "#af8dc3", "black"),lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=5, cex=1) #a plot for fun
+#dev.off()
+
+#SM-P.rett 2
+SM_P.rett_2 = subset(P.rett_extremes, rep == 'SM-P.rett2')
+plot(survfit(Surv(SM_P.rett_2$day,SM_P.rett_2$status)~SM_P.rett_2$primary+SM_P.rett_2$secondary_dose),col=c("#a6dba0", "#1b7837", "#af8dc3", "black"),lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(0,7))
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+#legend("topright",inset=0.02, bty="n" , c("PBS-P.rett 0.1", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "PBS-P.rett 5.0", "S.m-P.rett 0.1", "S.m-P.rett 1.0", "S.m-P.rett 2.0", "S.m-P.rett 5.0"),col=c("#a6dba0", "#1b7837", "#af8dc3", "black"),lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=5, cex=1) #a plot for fun
+#dev.off()
+
+#Experiment 1
+exp_1 = subset(P.rett_extremes, rep == 'Fall 2020 exp 1')
+plot(survfit(Surv(exp_1$day, exp_1$status)~exp_1$primary+exp_1$secondary_dose),col=c("#1b7837", "#af8dc3", "#762a83", "black"),lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(0,7))
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+#legend("topright",inset=0.02, bty="n" , c("PBS-P.rett 1.0", "PBS-P.rett 2.0", "PBS-P.rett 3.0" , "PBS-P.rett 5.0", "S.m-P.rett 1.0", "S.m-P.rett 2.0", "S.m-P.rett 3.0", "S.m-P.rett 5.0"),col=c("#1b7837", "#af8dc3", "#762a83", "black"),lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=5, cex=1) #a plot for fun
+#dev.off()
+
+#Experiment 3
+exp_3 = subset(P.rett_extremes, rep == 'Fall 2020 exp 3')
+plot(survfit(Surv(exp_3$day, exp_3$status)~exp_3$primary+exp_3$secondary_dose),col=c("#1b7837", "#af8dc3", "#762a83", "black"),lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(0,7))
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+#legend("topright",inset=0.02, bty="n" , c("PBS-P.rett 1.0", "PBS-P.rett 2.0", "PBS-P.rett 3.0" , "PBS-P.rett 5.0", "S.m-P.rett 1.0", "S.m-P.rett 2.0", "S.m-P.rett 3.0", "S.m-P.rett 5.0"),col=c("#1b7837", "#af8dc3", "#762a83", "black"),lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=5, cex=1) #a plot for fun
+#dev.off()
+
+#Experiment 10
+exp_10 = subset(P.rett_extremes, rep == 'Fall 2020 exp 10')
+plot(survfit(Surv(exp_10$day, exp_10$status)~exp_10$primary+exp_10$secondary_dose),col=c("#1b7837", "#af8dc3", "#762a83", "black"),lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(0,7))
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+#legend("topright",inset=0.02, bty="n" , c("PBS-P.rett 1.0", "PBS-P.rett 2.0", "PBS-P.rett 3.0" , "PBS-P.rett 5.0", "S.m-P.rett 1.0", "S.m-P.rett 2.0", "S.m-P.rett 3.0", "S.m-P.rett 5.0"),col=c("#1b7837", "#af8dc3", "#762a83", "black"),lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=5, cex=1) #a plot for fun
+#dev.off()
+```
+
+**P.snee Extreme Experiments**
+```{r, P.snee extreme experiments}
+table(P.snee_extremes$primary, P.snee_extremes$secondary_dose)
+
+#png(file="P.snee_extremes.png",width=1200,height=1200,res=130)
+plot(survfit(Surv(P.snee_extremes$day,P.snee_extremes$status)~P.snee_extremes$primary+P.snee_extremes$secondary_dose),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83"),lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(0,3))
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+legend("bottomleft", bty="n" , c("PBS-P.snee 0.001", "PBS-P.snee 0.01", "PBS-P.snee 0.1", "PBS-P.snee 1.0", "s.m-P.snee 0.001", "s.m-P.snee 0.01", "s.m-P.snee 0.1", "s.m-P.snee 1.0"),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83"),lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=5, cex=1)
+```
+
+```{r}
+#SM-sneebia_1
+SM_sneebia_1 = subset(P.snee_extremes, rep == 'SM-sneebia_1')
+plot(survfit(Surv(SM_sneebia_1$day, SM_sneebia_1$status)~SM_sneebia_1$primary+SM_sneebia_1$secondary_dose),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83"),lty=c(1, 1, 1, 1, 3, 3, 3, 3), lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(0,3))
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+legend("bottomleft", bty="n" , c("PBS-P.snee 0.001", "PBS-P.snee 0.01", "PBS-P.snee 0.1", "PBS-P.snee 1.0", "s.m-P.snee 0.001", "s.m-P.snee 0.01", "s.m-P.snee 0.1", "s.m-P.snee 1.0"),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83"),lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=5, cex=1)
+
+#SM-sneebia_2
+SM_sneebia_2 = subset(P.snee_extremes, rep == 'SM-sneebia_2')
+plot(survfit(Surv(SM_sneebia_2$day, SM_sneebia_2$status)~SM_sneebia_2$primary+SM_sneebia_2$secondary_dose),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83"),lty=c(1, 1, 1, 1, 3, 3, 3, 3), lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(0,3))
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+legend("bottomleft", bty="n" , c("PBS-P.snee 0.001", "PBS-P.snee 0.01", "PBS-P.snee 0.1", "PBS-P.snee 1.0", "s.m-P.snee 0.001", "s.m-P.snee 0.01", "s.m-P.snee 0.1", "s.m-P.snee 1.0"),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83"),lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=5, cex=1)
+
+#experiment 2
+exp2 = subset(P.snee_extremes, rep == 'Fall 2020 exp 2')
+plot(survfit(Surv(exp2$day, exp2$status)~exp2$primary+exp2$secondary_dose),col=c( "#a6dba0", "#1b7837", "#af8dc3", "#762a83"),lty=c(1, 1, 1, 1, 3, 3, 3, 3), lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(0,3))
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+#legend("bottomleft", bty="n" , c("PBS-P.snee 0.001", "PBS-P.snee 0.01", "PBS-P.snee 0.1", "PBS-P.snee 1.0", "s.m-P.snee 0.001", "s.m-P.snee 0.01", "s.m-P.snee 0.1", "s.m-P.snee 1.0"),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83"),lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=5, cex=1)
+
+#experiment 4
+exp4 = subset(P.snee_extremes, rep == 'Fall 2020 exp 4')
+plot(survfit(Surv(exp4$day, exp4$status)~exp4$primary+exp4$secondary_dose),col=c( "#a6dba0", "#1b7837", "#af8dc3", "#762a83"),lty=c(1, 1, 1, 1, 3, 3, 3, 3), lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(0,3))
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+#legend("topright",inset=0.02, bty="n" , c("PBS-P.snee 0.001", "PBS-P.snee 0.01", "PBS-P.snee 0.1", "PBS-P.snee 1.0", "s.m-P.snee 0.001", "s.m-P.snee 0.01", "s.m-P.snee 0.1", "s.m-P.snee 1.0"),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83"),lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=5, cex=1)
+
+#experiment 8
+exp8 = subset(P.snee_extremes, rep == 'Fall 2020 exp 8')
+plot(survfit(Surv(exp8$day, exp8$status)~exp8$primary+exp8$secondary_dose),col=c( "#a6dba0", "#1b7837", "#af8dc3", "#762a83"),lty=c(1, 1, 1, 1, 3, 3, 3, 3), lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(0,3))
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+#legend("topright",inset=0.02, bty="n" , c("PBS-P.snee 0.001", "PBS-P.snee 0.01", "PBS-P.snee 0.1", "PBS-P.snee 1.0", "s.m-P.snee 0.001", "s.m-P.snee 0.01", "s.m-P.snee 0.1", "s.m-P.snee 1.0"),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83"),lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=5, cex=1)
+```
+
+
+```{r}
+table(Varied_primary$condition)
+
+#png(file="Varied_primary.png",width=1200,height=1200,res=130)
+plot(survfit(Surv(Varied_primary$day,Varied_primary$status)~Varied_primary$condition),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black", "gray", "gray"),lty=c(1, 1, 1, 1, 1, 1, 3), lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(0,7))
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+#legend("topright",inset=0.02, bty="n" , c("S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0- P.rett 2.0", "S.m 2.0-P.rett 2.0", "PBS-P.rett 2.0", "PBS-PBS"),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black", "gray", "gray"),lty=c(1, 1, 1, 1, 1, 1, 3),lwd=5, cex=1) #a plot for fun
+
+#experiment 6
+exp6 = subset(Varied_primary, rep == 'Fall 2020 exp 6')
+plot(survfit(Surv(exp6$day, exp6$status)~exp6$condition),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black", "gray", "gray"),lty=c(1, 1, 1, 1, 1, 1, 3), lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5)
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+#legend("topright",inset=0.02, bty="n" , c("S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0- P.rett 2.0", "S.m 2.0-P.rett 2.0", "PBS-P.rett 2.0", "PBS-PBS"),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black", ' gray', 'gray'),lty=c(1, 1, 1, 1, 1, 1, 3),lwd=5, cex=1)
+
+#experiment 7
+exp7 = subset(Varied_primary, rep == 'Fall 2020 exp 7')
+plot(survfit(Surv(exp7$day, exp7$status)~exp7$condition),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black", "gray", "gray"),lty=c(1, 1, 1, 1, 1, 1, 3), lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5)
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+#legend("topright",inset=0.02, bty="n" , c("S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0- P.rett 2.0", "S.m 2.0-P.rett 2.0", "PBS-P.rett 2.0", "PBS-PBS"),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black", ' gray', 'gray'),lty=c(1, 1, 1, 1, 1, 1, 3),lwd=5, cex=1)
+
+#experiment 9
+exp9 = subset(Varied_primary, rep == 'Fall 2020 exp 9')
+plot(survfit(Surv(exp9$day, exp9$status)~exp9$condition),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black", "gray", "gray"),lty=c(1, 1, 1, 1, 1, 1, 3), lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5)
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+#legend("topright",inset=0.02, bty="n" , c("S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0- P.rett 2.0", "S.m 2.0-P.rett 2.0", "PBS-P.rett 2.0", "PBS-PBS"),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black", ' gray', 'gray'),lty=c(1, 1, 1, 1, 1, 1, 3),lwd=5, cex=1)
+
+#experiment 11
+exp11 = subset(Varied_primary, rep == 'Fall 2020 exp 11')
+plot(survfit(Surv(exp11$day, exp11$status)~exp11$condition),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black", "gray", "gray"),lty=c(1, 1, 1, 1, 1, 1, 3), lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5)
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+#legend("topright",inset=0.02, bty="n" , c("S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0- P.rett 2.0", "S.m 2.0-P.rett 2.0", "PBS-P.rett 2.0", "PBS-PBS"),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black", ' gray', 'gray'),lty=c(1, 1, 1, 1, 1, 3),lwd=5, cex=1)
+
+#experiment 12
+exp12 = subset(Varied_primary, rep == 'Fall 2020 exp 12')
+plot(survfit(Surv(exp12$day, exp12$status)~exp12$condition),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black", "gray", "gray"),lty=c(1, 1, 1, 1, 1, 1, 3), lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5)
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+#legend("topright",inset=0.02, bty="n" , c("S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0- P.rett 2.0", "S.m 2.0-P.rett 2.0", "PBS-P.rett 2.0", "PBS-PBS"),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black", ' gray', 'gray'),lty=c(1, 1, 1, 1, 1, 1, 3),lwd=5, cex=1)
+
+#experiment 13
+exp13 = subset(Varied_primary, rep == 'Fall 2020 exp 13')
+plot(survfit(Surv(exp13$day, exp13$status)~exp13$condition),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black", "gray", "gray"),lty=c(1, 1, 1, 1, 1, 1, 3), lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5)
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+#legend("topright",inset=0.02, bty="n" , c("S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0- P.rett 2.0", "S.m 2.0-P.rett 2.0", "PBS-P.rett 2.0", "PBS-PBS"),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black", ' gray', 'gray'),lty=c(1, 1, 1, 1, 1, 1, 3),lwd=5, cex=1)
+
+#experiment 14
+exp14 = subset(Varied_primary, rep == 'Fall 2020 exp 14')
+plot(survfit(Surv(exp14$day, exp14$status)~exp14$condition),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black", "gray", "gray"),lty=c(1, 1, 1, 1, 1, 1, 3), lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5)
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+#legend("topright",inset=0.02, bty="n" , c("S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0- P.rett 2.0", "S.m 2.0-P.rett 2.0", "PBS-P.rett 2.0", "PBS-PBS"),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black", ' gray', 'gray'),lty=c(1, 1, 1, 1, 1, 1, 3),lwd=5, cex=1)
+
+#experiment 16
+exp16 = subset(Varied_primary, rep == 'Fall 2020 exp 16')
+plot(survfit(Surv(exp16$day, exp16$status)~exp16$condition),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "gray", "gray"),lty=c(1, 1, 1, 1, 1, 3), lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5)
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+#legend("topright",inset=0.02, bty="n" , c("S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0- P.rett 2.0", "PBS-P.rett 2.0", "PBS-PBS"),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", ' gray', 'gray'),lty=c(1, 1, 1, 1, 1, 3),lwd=5, cex=1)
+
+```
+**Varied primary dose with P.snee as the secondary injection**
+Experiments from spring 2021
+```{r}
+#P.snee_varied_primary = subset(Varied_primary, rep == 'Fall 2020 exp 16')
+plot(survfit(Surv(P.snee_varied_primary$hour, P.snee_varied_primary$status)~P.snee_varied_primary$condition),col=c("gray", "gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#006bb3", "black"),lty=c(1, 3, 1, 1, 1, 1, 1), lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(15, 48))
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+#legend("topright",inset=0.02, bty="n" , c("PBS-P.snee 0.01", "PBS-PBS", "S.m 0.001-P.snee 0.01", "S.m 0.01-P.snee 0.01", "S.m 0.1-P.snee 0.01", "S.m 1.0-P.snee 0.01", "S.m 2.0-P.rett 0.01"), col=c("gray", "gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#006bb3", "black"), lty=c(1, 1, 1, 1, 1, 1, 1), lwd=5, cex=1)
+```
+
+Individual replicates
+```{r}
+#Spring 2021 Experiment 1
+P.snee_varied_primary1 = subset(P.snee_varied_primary, rep == 'Spring 2021 exp 1')
+plot(survfit(Surv(P.snee_varied_primary1$hour, P.snee_varied_primary1$status)~P.snee_varied_primary1$condition),col=c("gray", "gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#006bb3", "black"),lty=c(1, 3, 1, 1, 1, 1, 1), lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(15, 48))
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+
+#Spring 2021 Experiment 2
+P.snee_varied_primary2 = subset(P.snee_varied_primary, rep == 'Spring 2021 exp 2')
+plot(survfit(Surv(P.snee_varied_primary2$hour, P.snee_varied_primary2$status)~P.snee_varied_primary2$condition),col=c("gray", "gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#006bb3", "black"),lty=c(1, 3, 1, 1, 1, 1, 1), lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(15, 48))
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+
+#Spring 2021 Experiment 3
+P.snee_varied_primary3 = subset(P.snee_varied_primary, rep == 'Spring 2021 exp 3')
+plot(survfit(Surv(P.snee_varied_primary3$hour, P.snee_varied_primary3$status)~P.snee_varied_primary3$condition),col=c("gray", "gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#006bb3", "black"),lty=c(1, 3, 1, 1, 1, 1, 1), lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(15, 48))
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+
+#Spring 2021 Experiment 4
+P.snee_varied_primary4 = subset(P.snee_varied_primary, rep == 'Spring 2021 exp 4')
+plot(survfit(Surv(P.snee_varied_primary4$hour, P.snee_varied_primary4$status)~P.snee_varied_primary4$condition),col=c("gray", "gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#006bb3", "black"),lty=c(1, 3, 1, 1, 1, 1, 1), lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(15, 48))
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+
+#Spring 2021 Experiment 5
+P.snee_varied_primary5 = subset(P.snee_varied_primary, rep == 'Spring 2021 exp 5')
+plot(survfit(Surv(P.snee_varied_primary5$hour, P.snee_varied_primary5$status)~P.snee_varied_primary5$condition),col=c("gray", "gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#006bb3", "black"),lty=c(1, 3, 1, 1, 1, 1, 1), lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(15, 48))
+axis(2,las=2,cex.axis=1,lwd=4)
+axis(1,lwd=4, cex.axis=1)
+box(lwd=4)
+```
