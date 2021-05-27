@@ -104,28 +104,16 @@ legend("bottomleft",inset=0.02, bty="n" , c("PBS-P.snee 0.001", "PBS-PBS", "S.m 
 **E.fae-P.rett Experiments**
 
 ```{r, E.fae-P.rett Experiments}
-table(E.fae_P.rett$primary, E.fae_P.rett$X2_dose)
-
-#png(file="E.fae-P.rett.png",width=1200,height=1200,res=130)
-plot(survfit(Surv(E.fae_P.rett$day,E.fae_P.rett$status)~E.fae_P.rett$primary+E.fae_P.rett$X2_dose),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black", 'gray', '#cdc673'),lty=c(1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3),lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5)
-axis(2,las=2,cex.axis=1,lwd=4)
-axis(1,lwd=4, cex.axis=1)
-box(lwd=4)
-#legend("topright", bty="n" , c("E.fae-P.rett 0.001", "E.fae-P.rett 0.01", "E.fae-P.rett 0.05", "E.fae-P.rett 0.1", 'E.fae-P.rett 0.5', "E.fae-P.rett 1.0", 'E.fae-P.rett 2.0', "PBS-P.rett 0.001", "PBS-P.rett 0.01", "PBS-P.rett 0.05", "PBS-P.rett 0.1", "PBS-P.rett 0.5", 'PBS-P.rett 1.0', 'PBS-P.rett 2.0'),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black", 'gray', '#cdc673'),lty=c(1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3),lwd=5, cex=1) #a plot for fun
-#dev.off()
-
 #basically the same graph except taking out conditions with insufficient flies
 enough_E.fae_P.rett = subset(E.fae_P.rett, X2_dose == '0.001' | X2_dose == '0.01' | X2_dose == "0.1" | X2_dose == "1")
 table(enough_E.fae_P.rett$primary, enough_E.fae_P.rett$X2_dose)
 png(file="enough_E.fae-P.rett.png", width=1200, heigh=1200, res=130)
-plot(survfit(Surv(enough_E.fae_P.rett$day, enough_E.fae_P.rett$status) ~ enough_E.fae_P.rett$primary + enough_E.fae_P.rett$X2_dose), col=c("#B5E8FC", "#09B6FC", "#006bb3", "black"),lty=c(3, 3, 3, 3, 1, 1, 1, 1),lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5)
+plot(survfit(Surv(enough_E.fae_P.rett$day, enough_E.fae_P.rett$status) ~ enough_E.fae_P.rett$primary + enough_E.fae_P.rett$X2_dose), col=c("#B5E8FC", "#09B6FC", "#006bb3", "black"),lty=c(3, 3, 3, 3, 1, 1, 1, 1),lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(0,5))
 axis(2,las=2,cex.axis=1,lwd=4)
 axis(1,lwd=4, cex.axis=1)
 box(lwd=4)
-#legend("topright", bty="n" , c("E.fae-P.rett 0.001", "E.fae-P.rett 0.01", "E.fae-P.rett 0.05", "E.fae-P.rett 0.1", 'E.fae-P.rett 0.5', "E.fae-P.rett 1.0", 'E.fae-P.rett 2.0', "PBS-P.rett 0.001", "PBS-P.rett 0.01", "PBS-P.rett 0.05", "PBS-P.rett 0.1", "PBS-P.rett 0.5", 'PBS-P.rett 1.0', 'PBS-P.rett 2.0'),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black", 'gray', '#cdc673'),lty=c(3, 3, 3, 3, 1, 1, 1, 1),lwd=5, cex=1) #a plot for fun
+legend("topright", bty="n" , c("E.fae-P.rett 0.001", "E.fae-P.rett 0.01", "E.fae-P.rett 0.1", "E.fae-P.rett 1.0", "PBS-P.rett 0.001", "PBS-P.rett 0.01", "PBS-P.rett 0.1", 'PBS-P.rett 1.0'),col=c("#B5E8FC", "#09B6FC", "#006bb3", "black"),lty=c(3, 3, 3, 3, 1, 1, 1, 1),lwd=5, cex=1) #a plot for fun
 #dev.off()
-
-
 ```
 
 
