@@ -7,7 +7,8 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-setwd("C:/Users/amw03/Desktop/Research/extremes")
+getwd()
+#setwd("C:/Documents/GitHub/Chambers_Lab")
 ```
 
 Here is a beautiful R markdown file of all of the double injection experiments preformed the Chambers Lab from 2018 to the present (2020)
@@ -51,17 +52,19 @@ Replicate names: Fall 2020 exp 6, Fall 2020 exp 7, Fall 2020 exp 9, Fall 2020 ex
 library(survival)
 library(RColorBrewer)
 library(ggplot2)
-library(dplyr)
+library(rlang)
 
 rm(list=ls()) #removes all old variables
 
-all_data = read.csv("All_data.csv")
+all_data = read.csv("Complete Survival Data - All_data.csv")
 #date is always a way to uniquely refer to an experiment
 #replicate names where often added in later and sometimes repeat
 #fall 2020 experiments tried to address this
 
 extreme_data = read.csv("Fall 2020 Summary - all data.csv")
 #contains all the extreme data and data for varied primary injection dose
+
+spring2021 = read.csv("Spring 2021 Summary.csv")
 
 #E.fae-P.rett experiments
 E.fae_P.rett = subset(all_data, date == "6/18/18" | date == "6/20/18" | date == "6/22/18" | date == "6/25/18" | date == "7/19/18" | date == "7/23/18" | date == "6/4/19" | date == "6/5/19" | date == "6/11/19" | date == "7/1/19" | date == "7/3/19")
@@ -83,7 +86,7 @@ P.snee_varied_primary = read.csv("Spring 2021 Summary.csv")
 ```
 ```{r, spring 2021}
 
-extreme_data = read.csv("fly_data.csv")
+#extreme_data = read.csv("fly_data.csv")
 
 table(extreme_data$primary_dose, extreme_data$secondary)
 
@@ -201,11 +204,12 @@ box(lwd=4)
 table(P.snee_extremes$primary, P.snee_extremes$secondary_dose)
 
 #png(file="P.snee_extremes.png",width=1200,height=1200,res=130)
-plot(survfit(Surv(P.snee_extremes$day,P.snee_extremes$status)~P.snee_extremes$primary+P.snee_extremes$secondary_dose),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83"),lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(0,3))
-axis(2,las=2,cex.axis=1,lwd=4)
-axis(1,lwd=4, cex.axis=1)
-box(lwd=4)
-legend("bottomleft", bty="n" , c("PBS-P.snee 0.001", "PBS-P.snee 0.01", "PBS-P.snee 0.1", "PBS-P.snee 1.0", "s.m-P.snee 0.001", "s.m-P.snee 0.01", "s.m-P.snee 0.1", "s.m-P.snee 1.0"),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83"),lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=5, cex=1)
+plot(survfit(Surv(P.snee_extremes$day,P.snee_extremes$status)~P.snee_extremes$primary+P.snee_extremes$secondary_dose),col=c("gray","#B5E8FC", "#75D6FD", #09B6F), lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(0,3))
+axis(2,las=2,cex.axis=1,lwd=4),
+axis(1,lwd=4, cex.axis=1),
+box(lwd=4),
+legend("bottomleft", bty="n" , c("PBS-P.snee 0.001", "PBS-P.snee 0.01", "PBS-P.snee 0.1", "PBS-P.snee 1.0", "s.m-P.snee 0.001", "s.m-P.snee 0.01", "s.m-P.snee 0.1", "s.m-P.snee 1.0"),col=c("gray","#B5E8FC", "#75D6FD", "#09B6FC"), lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=5, cex=1)
+
 ```
 
 ```{r}
