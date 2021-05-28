@@ -102,7 +102,7 @@ legend("bottomleft",inset=0.02, bty="n" , c("PBS-P.snee 0.001", "PBS-PBS", "S.m 
 
 
 **E.fae-P.rett Experiments**
-
+Done!
 ```{r, E.fae-P.rett Experiments}
 enough_E.fae_P.rett = subset(E.fae_P.rett, X2_dose == '0.001' | X2_dose == '0.01' | X2_dose == "0.1" | X2_dose == "1" | X2_dose == "1.0")
 table(enough_E.fae_P.rett$primary, enough_E.fae_P.rett$X2_dose)
@@ -121,30 +121,31 @@ legend("topright", bty="n" , c("E.fae-P.rett 0.001", "E.fae-P.rett 0.01", "E.fae
 **S.m-P.rett Experiments**
 extremes not included
 individual replicates not included
+Done!
 ```{r, S.m-P.rett experiments, excluding extremes}
-
 table(S.m_P.rett$primary, S.m_P.rett$X2_dose)
-#png(file="S.m-P.rett.png",width=1200,height=1200,res=130)
+
+png(file="S.m-P.rett.png",width=1200,height=900,res=130)
 plot(survfit(Surv(S.m_P.rett$day,S.m_P.rett$status)~S.m_P.rett$primary+S.m_P.rett$X2_dose),col=c("#B5E8FC", "#75D6FD", "#09B6FC", "#006bb3", "black"),lty=c(1, 1, 1, 1, 1, 3, 3, 3, 3, 3),lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(0,4))
 axis(2,las=2,cex.axis=1,lwd=4)
 axis(1,lwd=4, cex.axis=1)
 box(lwd=4)
-legend("topright",inset=0.02, bty="n" , c("PBS-P.rett 0.001", "PBS-P.rett 0.01", "PBS-P.rett 0.1", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "S.m-P.rett 0.001", "S.m-P.rett 0.01", "S.m-P.rett 0.1", "S.m-P.rett 1.0", "S.m-P.rett 2.0"),col=c("#B5E8FC", "#75D6FD", "#09B6FC", "#006bb3", "black"),lty=c(3, 3, 3, 3, 3, 1, 1, 1, 1, 1),lwd=5, cex=1) #a plot for fun
+legend("bottomleft",inset=0.02, bty="n" , c("PBS-P.rett 0.001", "PBS-P.rett 0.01", "PBS-P.rett 0.1", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "S.m-P.rett 0.001", "S.m-P.rett 0.01", "S.m-P.rett 0.1", "S.m-P.rett 1.0", "S.m-P.rett 2.0"),col=c("#B5E8FC", "#75D6FD", "#09B6FC", "#006bb3", "black"),lty=c(3, 3, 3, 3, 3, 1, 1, 1, 1, 1),lwd=5, cex=1) #a plot for fun
 #dev.off()
 
 ```
 **P.rett Extreme Experiments**
 ```{r, P.rett extreme experiments}
 table(P.rett_extremes$primary, P.rett_extremes$secondary_dose)
-#png(file="P.rett_extremes.png",width=1200,height=1200,res=130)
-plot(survfit(Surv(P.rett_extremes$day,P.rett_extremes$status)~P.rett_extremes$primary+P.rett_extremes$secondary_dose),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black"),lty=c(1, 1, 1, 1, 1, 3, 3, 3, 3, 3),lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(0,7))
+png(file="P.rett_extremes.png",width=1200,height=900,res=130)
+plot(survfit(Surv(P.rett_extremes$day,P.rett_extremes$status)~P.rett_extremes$primary+P.rett_extremes$secondary_dose),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#006bb3", "black"),lty=c(1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3),lwd=4,cex=1,yaxt='n',xaxt='n',cex.main=2,cex.axis=2, ylab="proportion alive", xlab="days post-secondary infection", cex.lab=1.5, xlim=c(0,7))
 axis(2,las=2,cex.axis=1,lwd=4)
 axis(1,lwd=4, cex.axis=1)
 box(lwd=4)
-#legend("topright",inset=0.02, bty="n" , c("PBS-P.rett 0.1", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "PBS-P.rett 3.0", "PBS-P.rett 5.0", "S.m-P.rett 0.1", "S.m-P.rett 1.0", "S.m-P.rett 2.0", "S.m-P.rett 3.0", "S.m-P.rett 5.0"),col=c("#a6dba0", "#1b7837", "#af8dc3", "#762a83", "black"),lty=c(1, 1, 1, 1, 1, 3, 3, 3, 3, 3),lwd=5, cex=1) #a plot for fun
+legend("topright",inset=0.02, bty="n" , c("PBS-PBS", "PBS-P.rett 0.1", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "PBS-P.rett 3.0", "PBS-P.rett 5.0", "S.m-PBS", "S.m-P.rett 0.1", "S.m-P.rett 1.0", "S.m-P.rett 2.0", "S.m-P.rett 3.0", "S.m-P.rett 5.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#006bb3", "black"),lty=c(1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3),lwd=5, cex=1) #a plot for fun
 #dev.off()
-
 ```
+I want to combine all S.m-P.rett stuff
 
 Individual Replicates
 ```{r, P.rett extreme experiments individual replicates}
