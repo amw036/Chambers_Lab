@@ -16,7 +16,8 @@ library(RColorBrewer)
 library(ggplot2)
 
 rm(list=ls()) #removes all old variables
-E.fae_data = read.csv("E.fae resistance data.csv")
+E.fae_data_with2 = read.csv("E.fae resistance data.csv")
+E.fae_data = subset(E.fae_data_with2, dose != 2)
 S.m_data = read.csv("S.m resistance data.csv")
 
 ```
@@ -27,13 +28,8 @@ E.fae
 ```{r Bacterial load box and whisker}
 table(E.fae_data$dose)
 
-ggplot(E.fae_data, aes(x = log(dose), y = log(load), fill = primary)) +
+ggplot(E.fae_data, aes(x = as.character(dose), y = log(load), fill = primary)) +
   scale_fill_manual(values=c("#09B6FC", "gray")) +
-  geom_boxplot(aes(group=interaction(primary, dose)))
-
-
-ggplot(E.fae_data, aes(x = primary, y = log(load), fill = dose)) + 
-  scale_fill_gradient(low="#bbe9fc", high="#09B6FC") +
   geom_boxplot(aes(group=interaction(primary, dose)))
 
 ```
