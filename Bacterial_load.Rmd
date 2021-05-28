@@ -1,0 +1,40 @@
+---
+title: "Bacterial_load"
+author: "Abigail Wukitch"
+date: "5/28/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This is R code for the bacterial load experiments
+
+```{r load data and define variables}
+library(RColorBrewer)
+library(ggplot2)
+
+rm(list=ls()) #removes all old variables
+E.fae_data = read.csv("E.fae resistance data.csv")
+S.m_data = read.csv("S.m resistance data.csv")
+
+```
+
+**10 Hour Bacterial Load Box and Whisker Plot**
+
+E.fae
+```{r Bacterial load box and whisker}
+table(E.fae_data$dose)
+
+ggplot(E.fae_data, aes(x = log(dose), y = log(load), fill = primary)) +
+  scale_fill_manual(breaks = c(0.001, 0.01, 0.1, 1, 2), 
+                    values=c("red", "green", "blue", "purple", "orange")) + 
+  geom_boxplot(aes(group=interaction(primary, dose)))
+
+
+ggplot(E.fae_data, aes(x = primary, y = log(load), fill = dose)) + 
+  scale_color_continuous(low="blue", high="red") +
+  geom_boxplot(aes(group=interaction(primary, dose)))
+
+```
