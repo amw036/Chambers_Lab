@@ -28,13 +28,12 @@ E.fae
 table(E.fae_data$dose)
 
 ggplot(E.fae_data, aes(x = log(dose), y = log(load), fill = primary)) +
-  scale_fill_manual(breaks = c(0.001, 0.01, 0.1, 1, 2), 
-                    values=c("red", "green", "blue", "purple", "orange")) + 
+  scale_fill_manual(values=c("#09B6FC", "gray")) +
   geom_boxplot(aes(group=interaction(primary, dose)))
 
 
 ggplot(E.fae_data, aes(x = primary, y = log(load), fill = dose)) + 
-  scale_color_continuous(low="blue", high="red") +
+  scale_fill_gradient(low="#bbe9fc", high="#09B6FC") +
   geom_boxplot(aes(group=interaction(primary, dose)))
 
 ```
