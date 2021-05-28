@@ -28,8 +28,38 @@ E.fae
 ```{r Bacterial load box and whisker}
 table(E.fae_data$dose)
 
+png(file="E.fae_bacterial_load.png",width=1200,height=900,res=130)
 ggplot(E.fae_data, aes(x = as.character(dose), y = log(load), fill = primary)) +
   scale_fill_manual(values=c("#09B6FC", "gray")) +
-  geom_boxplot(aes(group=interaction(primary, dose)))
+  geom_boxplot() + 
+  theme_classic(base_size = 25) + 
+  xlab("secondary dose of P. rettgeri") +
+  ylab("log(calculated bacterial load)") +
+  geom_point(aes(fill=primary), size = 1.6, position=position_jitterdodge())
+
+```
+
+S.m 
+```{r Bacterial load box and whisker}
+table(S.m_data$primary, S.m_data$secondary)
+
+png(file="S.m_bacterial_load.png",width=1200,height=900,res=130)
+ggplot(S.m_data, aes(x = secondary, y = log(CFU_equiv), fill = primary)) +
+  scale_fill_manual(values=c("gray", "#09B6FC")) +
+  geom_boxplot() + 
+  theme_classic(base_size = 25) + 
+  xlab("secondary dose of P. rettgeri") +
+  ylab("log(calculated bacterial load)") + 
+  scale_x_discrete(labels = c("0.001", "0.01", "0.1", "1.0", "2.0")) +
+  geom_point(aes(fill=primary), size = 1.6, position=position_jitterdodge())
+
+png(file="no_individual_S.m_bacterial_load.png",width=1200,height=900,res=130)
+ggplot(S.m_data, aes(x = secondary, y = log(CFU_equiv), fill = primary)) +
+  scale_fill_manual(values=c("gray", "#09B6FC")) +
+  geom_boxplot() + 
+  theme_classic(base_size = 25) + 
+  xlab("secondary dose of P. rettgeri") +
+  ylab("log(calculated bacterial load)") + 
+  scale_x_discrete(labels = c("0.001", "0.01", "0.1", "1.0", "2.0")))
 
 ```
