@@ -87,6 +87,7 @@ Varied_primary = subset(extreme_data, rep == "Fall 2020 exp 6" | rep == "Fall 20
 #varied primary with P.snee
 P.snee_varied_primary = read.csv("Spring 2021 Summary.csv")
 ```
+
 ```{r, spring 2021}
 
 #extreme_data = read.csv("fly_data.csv")
