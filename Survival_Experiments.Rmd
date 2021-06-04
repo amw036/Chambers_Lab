@@ -349,9 +349,9 @@ axis(1, #bottom of the graph
      lwd=5) #line width
 box(lwd=5)
 
-png(file="P.rett_Varied_primary_legend.png",width=1200,height=900,res=130)
-plot(0,0, type='n', bty = 'n', xaxt = 'n', yaxt = 'n')
-legend("topright",inset=0.02, bty="n" , c("S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0- P.rett 2.0", "S.m 2.0-P.rett 2.0", "PBS-PBS", "PBS-P.rett 2.0"),col=c("#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694", "gray", "gray"),lty=c(1, 1, 1, 1, 1, 3, 4),lwd=5, cex=1) #a plot for fun
+#png(file="P.rett_Varied_primary_legend.png",width=1200,height=900,res=130)
+#plot(0,0, type='n', bty = 'n', xaxt = 'n', yaxt = 'n')
+legend("bottomleft", bty="n" , c("S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0- P.rett 2.0", "S.m 2.0-P.rett 2.0", "PBS-PBS", "PBS-P.rett 2.0"),col=c("#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694", "gray", "gray"),lty=c(1, 1, 1, 1, 1, 3, 4),lwd=5, cex=1) #a plot for fun
 ```
 
 ```{r individual replicates of varied primary with P.rett}
