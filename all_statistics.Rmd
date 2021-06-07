@@ -1,0 +1,46 @@
+---
+title: "Chronic Infection Protection Paper Stats"
+author: "Abigail Wukitch"
+date: "6/7/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load packages and data}
+library(survival)
+
+rm(list=ls()) #removes all old variables
+
+all_data = read.csv("Complete Survival Data - All_data.csv")
+#date is always a way to uniquely refer to an experiment
+#replicate names where often added in later and sometimes repeat
+#fall 2020 experiments tried to address this
+
+extreme_data = read.csv("Fall 2020 Summary - all data.csv")
+#contains all the extreme data and data for varied primary injection dose
+
+spring2021 = read.csv("Spring 2021 Summary.csv")
+
+```
+
+## E.fae - P.rett experiments
+
+```{r E.fae-P.rett}
+#E.fae-P.rett experiments
+E.fae_P.rett = subset(all_data, date == "6/18/18" | date == "6/20/18" | date == "6/22/18" | date == "6/25/18" | date == "7/19/18" | date == "7/23/18" | date == "6/3/19" | date == "6/5/19" | date == "6/11/19" | date == "7/1/19" | date == "7/3/19")
+
+#Because secondary questions have such a large range use the Log10 transformation
+E.fae_P.rett$absorbanceLog <- log10(E.fae_P.rett$X2_dose)
+
+#Generate a Cox proportional Hazards model which assesses the contribution of infectious dose while controlling for replicate
+#E.fae_P.rett_coxph <- coxph(Surv(day, status) ~ rep*absorbanceLog+primary*absorbanceLog, data = E.fae_P.rett)
+#summary(E.fae_P.rett_coxph)
+#anova(E.fae_P.rett_coxph)
+
+lm.model <- lm(E.fae_P.rett$rep ~ E.fae_P.rett$status)
+summary(lm.model)
+
+```
