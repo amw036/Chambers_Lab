@@ -31,16 +31,240 @@ spring2021 = read.csv("Spring 2021 Summary.csv")
 ```{r E.fae-P.rett}
 #E.fae-P.rett experiments
 E.fae_P.rett = subset(all_data, date == "6/18/18" | date == "6/20/18" | date == "6/22/18" | date == "6/25/18" | date == "7/19/18" | date == "7/23/18" | date == "6/3/19" | date == "6/5/19" | date == "6/11/19" | date == "7/1/19" | date == "7/3/19")
+E.fae_P.rett$rep <- as.factor(E.fae_P.rett$rep)
 
 #Because secondary questions have such a large range use the Log10 transformation
 E.fae_P.rett$absorbanceLog <- log10(E.fae_P.rett$X2_dose)
+E.fae_P.rett <- droplevels(E.fae_P.rett) #takes out all the extra empty rows that were excluded by the subset
 
 #Generate a Cox proportional Hazards model which assesses the contribution of infectious dose while controlling for replicate
-#E.fae_P.rett_coxph <- coxph(Surv(day, status) ~ rep*absorbanceLog+primary*absorbanceLog, data = E.fae_P.rett)
-#summary(E.fae_P.rett_coxph)
-#anova(E.fae_P.rett_coxph)
+E.fae_P.rett_coxph <- coxph(Surv(day, status) ~ rep+absorbanceLog+primary+rep:absorbanceLog+rep:primary+primary:absorbanceLog, data = E.fae_P.rett)
+summary(E.fae_P.rett_coxph)
+anova(E.fae_P.rett_coxph)
 
-lm.model <- lm(E.fae_P.rett$rep ~ E.fae_P.rett$status)
-summary(lm.model)
+#lm response is bacterial load
+#right of ~ is things that might influence the 
+#response variables = survival 
+#influential factors = dose, chronic infection status
 
+```
+
+## S.m - P.rett experiments
+
+```{r S.m-P.rett}
+#E.fae-P.rett experiments
+#all S.m 0.1-P.rett experiments ever (as of 5/28/21)
+all_S.m_P.rett = subset(all_data, date == "6/28/18" | date == "7/10/18" | date == "8/1/18" | date == "8/2/18" | date == "8/6/18" | date == "6/14/19" | date == "6/17/19" | date == "6/25/19" | date == "6/27/19" | rep == "SM-P.rett_1" | rep == "SM-P.rett2" | rep == "Fall 2020 exp 1" | rep == "Fall 2020 exp 3" | rep == "Fall 2020 exp 5" | rep == "Fall 2020 exp 10")
+
+S.m_P.rett = subset(all_S.m_P.rett, X2_dose != 0)
+S.m_P.rett$rep <- as.factor(S.m_P.rett$rep)
+S.m_P.rett <- droplevels(S.m_P.rett) #takes out all the extra empty rows that were excluded by the subset
+
+#Because secondary questions have such a large range use the Log10 transformation
+S.m_P.rett$absorbanceLog <- log10(S.m_P.rett$X2_dose)
+
+#Generate a Cox proportional Hazards model which assesses the contribution of infectious dose while controlling for replicate
+S.m_P.rett_coxph <- coxph(Surv(day, status) ~ absorbanceLog + primary + absorbanceLog:primary, data = S.m_P.rett)
+summary(S.m_P.rett_coxph)
+anova(S.m_P.rett_coxph)
+
+#separate by dose to see if the significance if dependent on dose
+S.m_P.rett_0.001 = subset(S.m_P.rett, X2_dose == 0.001)
+S.m_P.rett_0.001 <- droplevels(S.m_P.rett_0.001)
+S.m_P.rett_0.001_coxph <- coxph(Surv(day, status) ~ rep*primary, data = S.m_P.rett_0.001)
+#summary(S.m_P.rett_0.001_coxph)
+anova(S.m_P.rett_0.001_coxph)
+
+S.m_P.rett_0.01 = subset(S.m_P.rett, X2_dose == 0.01)
+S.m_P.rett_0.01 <- droplevels(S.m_P.rett_0.01)
+S.m_P.rett_0.01_coxph <- coxph(Surv(day, status) ~ rep*primary, data = S.m_P.rett_0.01)
+#summary(S.m_P.rett_0.01_coxph)
+anova(S.m_P.rett_0.01_coxph)
+
+S.m_P.rett_0.1 = subset(S.m_P.rett, X2_dose == 0.1)
+S.m_P.rett_0.1 <- droplevels(S.m_P.rett_0.1)
+S.m_P.rett_0.1_coxph <- coxph(Surv(day, status) ~ primary, data = S.m_P.rett_0.1) #removed rep because of imbalance (some were original S.m-P.rett experiments while others were extreme experiments and the replicates had different conditions with only some matching making it unhelpful to group)
+#summary(S.m_P.rett_0.1_coxph)
+anova(S.m_P.rett_0.1_coxph)
+
+S.m_P.rett_1 = subset(S.m_P.rett, X2_dose == 1)
+S.m_P.rett_1 <- droplevels(S.m_P.rett_1)
+S.m_P.rett_1_coxph <- coxph(Surv(day, status) ~ primary, data = S.m_P.rett_1) #removed rep because of imbalance
+#summary(S.m_P.rett_1_coxph)
+anova(S.m_P.rett_1_coxph)
+
+S.m_P.rett_2 = subset(S.m_P.rett, X2_dose == 2)
+S.m_P.rett_2 <- droplevels(S.m_P.rett_2)
+S.m_P.rett_2_coxph <- coxph(Surv(day, status) ~ rep*primary, data = S.m_P.rett_2)
+#summary(S.m_P.rett_2_coxph)
+anova(S.m_P.rett_2_coxph)
+
+S.m_P.rett_3 = subset(S.m_P.rett, X2_dose == 3)
+S.m_P.rett_3 <- droplevels(S.m_P.rett_3)
+S.m_P.rett_3_coxph <- coxph(Surv(day, status) ~ rep*primary, data = S.m_P.rett_3)
+#summary(S.m_P.rett_3_coxph)
+anova(S.m_P.rett_3_coxph)
+
+S.m_P.rett_5 = subset(S.m_P.rett, X2_dose == 5)
+S.m_P.rett_5 <- droplevels(S.m_P.rett_5)
+S.m_P.rett_5_coxph <- coxph(Surv(day, status) ~ rep*primary, data = S.m_P.rett_5)
+#summary(S.m_P.rett_3_coxph)
+anova(S.m_P.rett_5_coxph)
+
+```
+
+```{r no extremes}
+
+#S.m-P.rett experiments (not including extremes)
+no_extreme_S.m_P.rett = subset(all_data, date == "6/28/18" | date == "7/10/18" | date == "8/1/18" | date == "8/2/18" | date == "8/6/18" | date == "6/14/19" | date == "6/17/19" | date == "6/25/19" | date == "6/27/19")
+
+no_extreme_S.m_P.rett = subset(no_extreme_S.m_P.rett, X2_dose != 0)
+no_extreme_S.m_P.rett$rep <- as.factor(no_extreme_S.m_P.rett$rep)
+no_extreme_S.m_P.rett <- droplevels(no_extreme_S.m_P.rett)
+table(no_extreme_S.m_P.rett$primary)
+
+#Because secondary questions have such a large range use the Log10 transformation
+no_extreme_S.m_P.rett$absorbanceLog <- log10(no_extreme_S.m_P.rett$X2_dose)
+
+#Generate a Cox proportional Hazards model which assesses the contribution of infectious dose while controlling for replicate
+no_extreme_S.m_P.rett_coxph <- coxph(Surv(day, status) ~ rep + absorbanceLog + primary + rep:absorbanceLog + rep:primary + absorbanceLog:primary, data = no_extreme_S.m_P.rett)
+#summary(no_extreme_S.m_P.rett_coxph)
+anova(no_extreme_S.m_P.rett_coxph)
+
+```
+
+```{r S.m-P.rett extremes}
+#P.rett extremes
+all_P.rett_extremes = subset(extreme_data, rep == "SM-P.rett_1" | rep == "SM-P.rett2" | rep == "Fall 2020 exp 1" | rep == "Fall 2020 exp 3" | rep == "Fall 2020 exp 5" | rep == "Fall 2020 exp 10")
+
+P.rett_extremes = subset(all_P.rett_extremes, secondary_dose != 0)
+P.rett_extremes$rep <- as.factor(P.rett_extremes$rep)
+P.rett_extremes <- droplevels(P.rett_extremes)
+
+#Because secondary questions have such a large range use the Log10 transformation
+P.rett_extremes$absorbanceLog <- log10(P.rett_extremes$secondary_dose)
+
+#Generate a Cox proportional Hazards model which assesses the contribution of infectious dose while controlling for replicate
+P.rett_extremes_coxph <- coxph(Surv(day, status) ~ rep + absorbanceLog + primary + rep:absorbanceLog + rep:primary + absorbanceLog:primary, data = P.rett_extremes)
+#summary(P.rett_extremes_coxph)
+anova(P.rett_extremes_coxph)
+
+```
+
+## S.m - P.snee experiments
+```{r}
+#P.snee extremes
+P.snee_extremes = subset(extreme_data, rep == "SM-sneebia_1" | rep == "SM-sneebia_2" | rep == "Fall 2020 exp 2" | rep == "Fall 2020 exp 4" | rep == "Fall 2020 exp 8")
+P.snee_extremes = subset(P.snee_extremes, secondary_dose != 0)
+P.snee_extremes$absorbanceLog <- log10(P.snee_extremes$secondary_dose)
+P.snee_extremes <- droplevels(P.snee_extremes)
+
+#Generate a Cox proportional Hazards model which assesses the contribution of infectious dose while controlling for replicate
+P.snee_extremes_coxph <- coxph(Surv(day, status) ~ rep+absorbanceLog+primary+rep:absorbanceLog+rep:primary+primary:absorbanceLog, data = P.snee_extremes)
+summary(P.snee_extremes_coxph)
+anova(P.snee_extremes_coxph)
+
+#separate by dose to see if the significance if dependent on dose
+P.snee_extremes_0.001 = subset(P.snee_extremes, secondary_dose == 0.001)
+P.snee_extremes_0.001 <- droplevels(P.snee_extremes_0.001)
+P.snee_extremes_0.001_coxph <- coxph(Surv(day, status) ~ rep*primary, data = P.snee_extremes_0.001)
+#summary(P.snee_extremes_0.001_coxph)
+anova(P.snee_extremes_0.001_coxph)
+
+P.snee_extremes_0.01 = subset(P.snee_extremes, secondary_dose == 0.01)
+P.snee_extremes_0.01 <- droplevels(P.snee_extremes_0.01)
+P.snee_extremes_0.01_coxph <- coxph(Surv(day, status) ~ rep*primary, data = P.snee_extremes_0.01)
+#summary(P.snee_extremes_0.01_coxph)
+anova(P.snee_extremes_0.01_coxph)
+
+P.snee_extremes_0.1 = subset(P.snee_extremes, secondary_dose == 0.1)
+P.snee_extremes_0.1 <- droplevels(P.snee_extremes_0.1)
+P.snee_extremes_0.1_coxph <- coxph(Surv(day, status) ~ rep*primary, data = P.snee_extremes_0.1)
+#summary(P.snee_extremes_0.1_coxph)
+anova(P.snee_extremes_0.1_coxph)
+
+P.snee_extremes_1 = subset(P.snee_extremes, secondary_dose == 1)
+P.snee_extremes_1 <- droplevels(P.snee_extremes_1)
+P.snee_extremes_1_coxph <- coxph(Surv(day, status) ~ rep*primary, data = P.snee_extremes_1)
+#summary(P.snee_extremes_1_coxph)
+anova(P.snee_extremes_1_coxph)
+```
+
+## S.m-P.rett varied primary dose
+this is being really difficult because now I am changing the primary not the secondary dose
+I can't use absorbanceLog if I include the ones without chronic infections
+
+so here it is without the PBS-P.rett condition included
+
+GIVING UP HERE BECAUSE I AM HUNGRY AND I NEED TO TALK TO CHAMBERS ABOUT HOW TO APPROACH THIS
+```{r}
+#Varied primary dose
+P.rett_varied_primary = subset(extreme_data, rep == "Fall 2020 exp 6" | rep == "Fall 2020 exp 7" | rep == "Fall 2020 exp 9" | rep == "Fall 2020 exp 11" | rep == "Fall 2020 exp 12" | rep == "Fall 2020 exp 13" | rep == "Fall 2020 exp 14" | rep == "Fall 2020 exp 16")
+P.rett_varied_primary = subset(P.rett_varied_primary, secondary_dose != 0)
+P.rett_varied_primary$absorbanceLog <- log10(P.rett_varied_primary$primary_dose)
+P.rett_varied_primary <- droplevels(P.rett_varied_primary)
+
+#Generate a Cox proportional Hazards model which assesses the contribution of infectious dose while controlling for replicate
+P.rett_varied_primary_coxph <- coxph(Surv(day, status) ~ rep + primary_dose + rep:primary_dose, data = P.rett_varied_primary)
+summary(P.rett_varied_primary_coxph)
+anova(P.rett_varied_primary_coxph)
+
+#separate by dose to see if the significance if dependent on dose
+P.rett_varied_primary_0.001 = subset(P.rett_varied_primary, primary_dose == 0.001)
+P.rett_varied_primary_0.001 <- droplevels(P.rett_varied_primary_0.001)
+P.rett_varied_primary_0.001_coxph <- coxph(Surv(day, status) ~ rep + primary_dose + secondary + rep:primary_dose, data = P.rett_varied_primary_0.001)
+#summary(P.rett_varied_primary_0.001_coxph)
+anova(P.rett_varied_primary_0.001_coxph)
+
+table(P.rett_varied_primary$secondary)
+
+P.rett_varied_primary_0.01 = subset(P.rett_varied_primary, primary_dose == 0.01 | primary_dose == 0)
+P.rett_varied_primary_0.01 <- droplevels(P.rett_varied_primary_0.01)
+P.rett_varied_primary_0.01_coxph <- coxph(Surv(day, status) ~ rep + primary_dose + secondary + rep:primary_dose + rep:secondary, data = P.rett_varied_primary_0.01)
+#summary(P.rett_varied_primary_0.01_coxph)
+anova(P.rett_varied_primary_0.01_coxph)
+```
+and here it is using absorbance instead of absorbanceLog
+```{r}
+#P.rett_varied_primary$absorbanceLog <- log10(P.rett_varied_primary$primary_dose)
+P.rett_varied_primary <- droplevels(P.rett_varied_primary)
+
+#Generate a Cox proportional Hazards model which assesses the contribution of infectious dose while controlling for replicate
+P.rett_varied_primary_coxph <- coxph(Surv(day, status) ~ rep + primary_dose + secondary + rep:primary_dose + rep:secondary + primary_dose:secondary, data = P.rett_varied_primary)
+summary(P.rett_varied_primary_coxph)
+anova(P.rett_varied_primary_coxph)
+
+table(P.rett_varied_primary$primary)
+
+#separate by dose to see if the significance if dependent on dose
+P.rett_varied_primary_0.001 = subset(P.rett_varied_primary, primary_dose == 0 | primary_dose == 0.001)
+P.rett_varied_primary_0.001 <- droplevels(P.rett_varied_primary_0.001)
+P.rett_varied_primary_0.001_coxph <- coxph(Surv(day, status) ~ rep + primary + secondary + rep:primary + rep:secondary, data = P.rett_varied_primary_0.001)
+summary(P.rett_varied_primary_0.001_coxph)
+anova(P.rett_varied_primary_0.001_coxph)
+
+P.rett_varied_primary_0.01 = subset(P.rett_varied_primary, primary_dose == 0.01 | primary_dose == 0)
+P.rett_varied_primary_0.01 <- droplevels(P.rett_varied_primary_0.01)
+P.rett_varied_primary_0.01_coxph <- coxph(Surv(day, status) ~ primary_dose + secondary, data = P.rett_varied_primary_0.01)
+#summary(P.rett_varied_primary_0.01_coxph)
+anova(P.rett_varied_primary_0.01_coxph)
+
+P.rett_varied_primary_0.1 = subset(P.rett_varied_primary, primary_dose == 0.1 | primary_dose == 0)
+P.rett_varied_primary_0.1 <- droplevels(P.rett_varied_primary_0.1)
+P.rett_varied_primary_0.1_coxph <- coxph(Surv(day, status) ~ primary_dose + secondary, data = P.rett_varied_primary_0.1)
+#summary(P.rett_varied_primary_0.1_coxph)
+anova(P.rett_varied_primary_0.1_coxph)
+
+P.rett_varied_primary_1 = subset(P.rett_varied_primary, primary_dose == 1 | primary_dose == 0)
+P.rett_varied_primary_1 <- droplevels(P.rett_varied_primary_1)
+P.rett_varied_primary_1_coxph <- coxph(Surv(day, status) ~ rep + primary + secondary + rep:primary + rep:secondary, data = P.rett_varied_primary_1)
+summary(P.rett_varied_primary_1_coxph)
+anova(P.rett_varied_primary_1_coxph)
+```
+
+
+## S.m-P.snee varied primary dose
+```{r}
+#varied primary with P.snee
+P.snee_varied_primary = read.csv("Spring 2021 Summary.csv")
 ```
