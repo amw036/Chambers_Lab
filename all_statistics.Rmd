@@ -191,80 +191,93 @@ anova(P.snee_extremes_1_coxph)
 ```
 
 ## S.m-P.rett varied primary dose
-this is being really difficult because now I am changing the primary not the secondary dose
-I can't use absorbanceLog if I include the ones without chronic infections
-
-so here it is without the PBS-P.rett condition included
-
-GIVING UP HERE BECAUSE I AM HUNGRY AND I NEED TO TALK TO CHAMBERS ABOUT HOW TO APPROACH THIS
 ```{r}
 #Varied primary dose
 P.rett_varied_primary = subset(extreme_data, rep == "Fall 2020 exp 6" | rep == "Fall 2020 exp 7" | rep == "Fall 2020 exp 9" | rep == "Fall 2020 exp 11" | rep == "Fall 2020 exp 12" | rep == "Fall 2020 exp 13" | rep == "Fall 2020 exp 14" | rep == "Fall 2020 exp 16")
 P.rett_varied_primary = subset(P.rett_varied_primary, secondary_dose != 0)
-P.rett_varied_primary$absorbanceLog <- log10(P.rett_varied_primary$primary_dose)
-P.rett_varied_primary <- droplevels(P.rett_varied_primary)
-
-#Generate a Cox proportional Hazards model which assesses the contribution of infectious dose while controlling for replicate
-P.rett_varied_primary_coxph <- coxph(Surv(day, status) ~ rep + primary_dose + rep:primary_dose, data = P.rett_varied_primary)
-summary(P.rett_varied_primary_coxph)
-anova(P.rett_varied_primary_coxph)
-
-#separate by dose to see if the significance if dependent on dose
-P.rett_varied_primary_0.001 = subset(P.rett_varied_primary, primary_dose == 0.001)
-P.rett_varied_primary_0.001 <- droplevels(P.rett_varied_primary_0.001)
-P.rett_varied_primary_0.001_coxph <- coxph(Surv(day, status) ~ rep + primary_dose + secondary + rep:primary_dose, data = P.rett_varied_primary_0.001)
-#summary(P.rett_varied_primary_0.001_coxph)
-anova(P.rett_varied_primary_0.001_coxph)
-
-table(P.rett_varied_primary$secondary)
-
-P.rett_varied_primary_0.01 = subset(P.rett_varied_primary, primary_dose == 0.01 | primary_dose == 0)
-P.rett_varied_primary_0.01 <- droplevels(P.rett_varied_primary_0.01)
-P.rett_varied_primary_0.01_coxph <- coxph(Surv(day, status) ~ rep + primary_dose + secondary + rep:primary_dose + rep:secondary, data = P.rett_varied_primary_0.01)
-#summary(P.rett_varied_primary_0.01_coxph)
-anova(P.rett_varied_primary_0.01_coxph)
-```
-and here it is using absorbance instead of absorbanceLog
-```{r}
 #P.rett_varied_primary$absorbanceLog <- log10(P.rett_varied_primary$primary_dose)
 P.rett_varied_primary <- droplevels(P.rett_varied_primary)
 
-#Generate a Cox proportional Hazards model which assesses the contribution of infectious dose while controlling for replicate
-P.rett_varied_primary_coxph <- coxph(Surv(day, status) ~ rep + primary_dose + secondary + rep:primary_dose + rep:secondary + primary_dose:secondary, data = P.rett_varied_primary)
-summary(P.rett_varied_primary_coxph)
-anova(P.rett_varied_primary_coxph)
-
-table(P.rett_varied_primary$primary)
-
 #separate by dose to see if the significance if dependent on dose
-P.rett_varied_primary_0.001 = subset(P.rett_varied_primary, primary_dose == 0 | primary_dose == 0.001)
+P.rett_varied_primary_0.001 = subset(P.rett_varied_primary, primary_dose == 0.001 | primary_dose == 0)
 P.rett_varied_primary_0.001 <- droplevels(P.rett_varied_primary_0.001)
-P.rett_varied_primary_0.001_coxph <- coxph(Surv(day, status) ~ rep + primary + secondary + rep:primary + rep:secondary, data = P.rett_varied_primary_0.001)
-summary(P.rett_varied_primary_0.001_coxph)
+P.rett_varied_primary_0.001_coxph <- coxph(Surv(day, status) ~ rep + primary + rep:primary, data = P.rett_varied_primary_0.001)
+#summary(P.rett_varied_primary_0.001_coxph)
 anova(P.rett_varied_primary_0.001_coxph)
 
 P.rett_varied_primary_0.01 = subset(P.rett_varied_primary, primary_dose == 0.01 | primary_dose == 0)
 P.rett_varied_primary_0.01 <- droplevels(P.rett_varied_primary_0.01)
-P.rett_varied_primary_0.01_coxph <- coxph(Surv(day, status) ~ primary_dose + secondary, data = P.rett_varied_primary_0.01)
+P.rett_varied_primary_0.01_coxph <- coxph(Surv(day, status) ~ rep + primary + rep:primary, data = P.rett_varied_primary_0.01)
 #summary(P.rett_varied_primary_0.01_coxph)
 anova(P.rett_varied_primary_0.01_coxph)
 
 P.rett_varied_primary_0.1 = subset(P.rett_varied_primary, primary_dose == 0.1 | primary_dose == 0)
 P.rett_varied_primary_0.1 <- droplevels(P.rett_varied_primary_0.1)
-P.rett_varied_primary_0.1_coxph <- coxph(Surv(day, status) ~ primary_dose + secondary, data = P.rett_varied_primary_0.1)
+P.rett_varied_primary_0.1_coxph <- coxph(Surv(day, status) ~ rep + primary + rep:primary, data = P.rett_varied_primary_0.1)
 #summary(P.rett_varied_primary_0.1_coxph)
 anova(P.rett_varied_primary_0.1_coxph)
 
 P.rett_varied_primary_1 = subset(P.rett_varied_primary, primary_dose == 1 | primary_dose == 0)
 P.rett_varied_primary_1 <- droplevels(P.rett_varied_primary_1)
-P.rett_varied_primary_1_coxph <- coxph(Surv(day, status) ~ rep + primary + secondary + rep:primary + rep:secondary, data = P.rett_varied_primary_1)
-summary(P.rett_varied_primary_1_coxph)
+P.rett_varied_primary_1_coxph <- coxph(Surv(day, status) ~ rep + primary + rep:primary, data = P.rett_varied_primary_1)
+#summary(P.rett_varied_primary_1_coxph)
 anova(P.rett_varied_primary_1_coxph)
-```
 
+P.rett_varied_primary_2 = subset(P.rett_varied_primary, primary_dose == 2 | primary_dose == 0)
+P.rett_varied_primary_2 <- droplevels(P.rett_varied_primary_2)
+P.rett_varied_primary_2_coxph <- coxph(Surv(day, status) ~ rep + primary + rep:primary, data = P.rett_varied_primary_2)
+#summary(P.rett_varied_primary_2_coxph)
+anova(P.rett_varied_primary_2_coxph)
+```
 
 ## S.m-P.snee varied primary dose
 ```{r}
 #varied primary with P.snee
 P.snee_varied_primary = read.csv("Spring 2021 Summary.csv")
+
+P.snee_varied_primary = subset(P.snee_varied_primary, secondary_dose != 0)
+P.snee_varied_primary <- droplevels(P.snee_varied_primary)
+
+table(P.snee_varied_primary$primary_dose)
+
+#separate by dose to see if the significance if dependent on dose
+print("Dose = 0.001")
+P.snee_varied_primary_0.001 = subset(P.snee_varied_primary, primary_dose == 0.001 | primary_dose == 0)
+P.snee_varied_primary_0.001 <- droplevels(P.snee_varied_primary_0.001)
+P.snee_varied_primary_0.001_coxph <- coxph(Surv(day, status) ~ rep + primary + rep:primary, data = P.snee_varied_primary_0.001)
+#summary(P.snee_varied_primary_0.001_coxph)
+anova(P.snee_varied_primary_0.001_coxph)
+print('')
+
+print("Dose = 0.01")
+P.snee_varied_primary_0.01 = subset(P.snee_varied_primary, primary_dose == 0.01 | primary_dose == 0)
+P.snee_varied_primary_0.01 <- droplevels(P.snee_varied_primary_0.01)
+P.snee_varied_primary_0.01_coxph <- coxph(Surv(day, status) ~ rep + primary + rep:primary, data = P.snee_varied_primary_0.01)
+#summary(P.snee_varied_primary_0.01_coxph)
+anova(P.snee_varied_primary_0.01_coxph)
+print('')
+
+print("Dose = 0.1")
+P.snee_varied_primary_0.1 = subset(P.snee_varied_primary, primary_dose == 0.1 | primary_dose == 0)
+P.snee_varied_primary_0.1 <- droplevels(P.snee_varied_primary_0.1)
+P.snee_varied_primary_0.1_coxph <- coxph(Surv(day, status) ~ rep + primary + rep:primary, data = P.snee_varied_primary_0.1)
+#summary(P.snee_varied_primary_0.1_coxph)
+anova(P.snee_varied_primary_0.1_coxph)
+print('')
+
+print("Dose = 1")
+P.snee_varied_primary_1 = subset(P.snee_varied_primary, primary_dose == 1 | primary_dose == 0)
+table(P.snee_varied_primary$primary_dose)
+P.snee_varied_primary_1 <- droplevels(P.snee_varied_primary_1)
+P.snee_varied_primary_1_coxph <- coxph(Surv(day, status) ~ rep + primary + rep:primary, data = P.snee_varied_primary_1)
+summary(P.snee_varied_primary_1_coxph)
+anova(P.snee_varied_primary_1_coxph)
+print('')
+
+print("Dose = 2")
+P.snee_varied_primary_2 = subset(P.snee_varied_primary, primary_dose == 2 | primary_dose == 0)
+P.snee_varied_primary_2 <- droplevels(P.snee_varied_primary_2)
+P.snee_varied_primary_2_coxph <- coxph(Surv(day, status) ~ rep + primary + rep:primary, data = P.snee_varied_primary_2)
+#summary(P.snee_varied_primary_2_coxph)
+anova(P.snee_varied_primary_2_coxph)
 ```
