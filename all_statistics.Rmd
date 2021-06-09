@@ -234,47 +234,34 @@ anova(P.rett_varied_primary_2_coxph)
 ```{r}
 #varied primary with P.snee
 P.snee_varied_primary = read.csv("Spring 2021 Summary.csv")
-
 P.snee_varied_primary = subset(P.snee_varied_primary, secondary_dose != 0)
 P.snee_varied_primary <- droplevels(P.snee_varied_primary)
 
-table(P.snee_varied_primary$primary_dose)
-
 #separate by dose to see if the significance if dependent on dose
-print("Dose = 0.001")
 P.snee_varied_primary_0.001 = subset(P.snee_varied_primary, primary_dose == 0.001 | primary_dose == 0)
 P.snee_varied_primary_0.001 <- droplevels(P.snee_varied_primary_0.001)
 P.snee_varied_primary_0.001_coxph <- coxph(Surv(day, status) ~ rep + primary + rep:primary, data = P.snee_varied_primary_0.001)
 #summary(P.snee_varied_primary_0.001_coxph)
 anova(P.snee_varied_primary_0.001_coxph)
-print('')
 
-print("Dose = 0.01")
 P.snee_varied_primary_0.01 = subset(P.snee_varied_primary, primary_dose == 0.01 | primary_dose == 0)
 P.snee_varied_primary_0.01 <- droplevels(P.snee_varied_primary_0.01)
 P.snee_varied_primary_0.01_coxph <- coxph(Surv(day, status) ~ rep + primary + rep:primary, data = P.snee_varied_primary_0.01)
 #summary(P.snee_varied_primary_0.01_coxph)
 anova(P.snee_varied_primary_0.01_coxph)
-print('')
 
-print("Dose = 0.1")
 P.snee_varied_primary_0.1 = subset(P.snee_varied_primary, primary_dose == 0.1 | primary_dose == 0)
 P.snee_varied_primary_0.1 <- droplevels(P.snee_varied_primary_0.1)
 P.snee_varied_primary_0.1_coxph <- coxph(Surv(day, status) ~ rep + primary + rep:primary, data = P.snee_varied_primary_0.1)
 #summary(P.snee_varied_primary_0.1_coxph)
 anova(P.snee_varied_primary_0.1_coxph)
-print('')
 
-print("Dose = 1")
 P.snee_varied_primary_1 = subset(P.snee_varied_primary, primary_dose == 1 | primary_dose == 0)
-table(P.snee_varied_primary$primary_dose)
 P.snee_varied_primary_1 <- droplevels(P.snee_varied_primary_1)
 P.snee_varied_primary_1_coxph <- coxph(Surv(day, status) ~ rep + primary + rep:primary, data = P.snee_varied_primary_1)
-summary(P.snee_varied_primary_1_coxph)
+#summary(P.snee_varied_primary_1_coxph)
 anova(P.snee_varied_primary_1_coxph)
-print('')
 
-print("Dose = 2")
 P.snee_varied_primary_2 = subset(P.snee_varied_primary, primary_dose == 2 | primary_dose == 0)
 P.snee_varied_primary_2 <- droplevels(P.snee_varied_primary_2)
 P.snee_varied_primary_2_coxph <- coxph(Surv(day, status) ~ rep + primary + rep:primary, data = P.snee_varied_primary_2)
