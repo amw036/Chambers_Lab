@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r load packages and data}
 library(survival)
+library(coxme)
 
 rm(list=ls()) #removes all old variables
 
@@ -41,6 +42,13 @@ E.fae_P.rett <- droplevels(E.fae_P.rett) #takes out all the extra empty rows tha
 E.fae_P.rett_coxph <- coxph(Surv(day, status) ~ rep+absorbanceLog+primary+rep:absorbanceLog+rep:primary+primary:absorbanceLog, data = E.fae_P.rett)
 summary(E.fae_P.rett_coxph)
 anova(E.fae_P.rett_coxph)
+
+E.fae_P.rett$factor_absorbanceLog <- as.factor(E.fae_P.rett$absorbanceLog)
+E.fae_P.rett$factor_dose <- as.factor(E.fae_P.rett$X2_dose)
+
+E.fae_P.rett_coxme <- coxme(Surv(day, status) ~ absorbanceLog * primary + (1 | rep/primary/factor_dose), data = E.fae_P.rett)
+summary(E.fae_P.rett_coxme)
+anova(E.fae_P.rett_coxme)
 
 #lm response is bacterial load
 #right of ~ is things that might influence the 
