@@ -1,0 +1,63 @@
+---
+title: "Alexa's survival"
+author: "Abigail Wukitch"
+date: "7/14/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r, load and organize data}
+library(survival)
+library(RColorBrewer)
+library(ggplot2)
+library(rlang)
+
+rm(list=ls()) #removes all old variables
+
+all_data = read.csv("Exp2_summer2021.csv")
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r, S,m-P.rett exp 2}
+table(all_data$primary, all_data$secondary_dose)
+png(file="S.m_P.rett Exp 2.png",width=1200,height=900,res=130)
+
+par(mar=c(4,5,1,1)) #sets the margins around the graph so there is room for the labels
+
+plot(survfit(Surv(all_data$day, all_data$status) ~ all_data$primary + all_data$secondary_dose), 
+     col=c("#B5E8FC", "#75D6FD", "#09B6FC", "#003694"), #colors of lines
+     lty=c(3, 3, 3, 3, 1, 1, 1, 1), #type of line, 1 = solid, 3 = dashed
+     lwd=5, #line width
+     yaxt='n', 
+     xaxt='n', 
+     ylab="proportion alive", #label for the y-axis
+     xlab="days post-secondary infection", #label for the x-axis
+     cex.lab=2.5, #font size of axis labels
+     xlim=c(0,7), #determines range of the x-axis
+     xaxs='i') #makes the data flush with the axis 
+axis(2, #left side
+     las=2, #perpendicular to the axis
+     cex.axis=1.5, #font size
+     lwd=5) #line width
+axis(1, #bottom of the graph
+     cex.axis=1.5, #font size
+     lwd=5) #line width
+box(lwd=5)
+
+legend("topright",inset=0, bty="n" , c("PBS-PBS", "PBS-P.rett 0.01", "PBS-P.rett 0.1", "PBS-P.rett 1.0", "S.m 0.1-PBS", "S.m 0.1-P.rett 0.01", "S.m 0.1-P.rett 0.1", "S.m 0.1-P.rett 1.0"),col=c("#B5E8FC", "#75D6FD", "#09B6FC", "#003694"),lty=c(3, 3, 3, 3, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
