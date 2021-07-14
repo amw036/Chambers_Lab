@@ -39,16 +39,16 @@ E.fae_P.rett$absorbanceLog <- log10(E.fae_P.rett$X2_dose)
 E.fae_P.rett <- droplevels(E.fae_P.rett) #takes out all the extra empty rows that were excluded by the subset
 
 #Generate a Cox proportional Hazards model which assesses the contribution of infectious dose while controlling for replicate
-E.fae_P.rett_coxph <- coxph(Surv(day, status) ~ rep+absorbanceLog+primary+rep:absorbanceLog+rep:primary+primary:absorbanceLog, data = E.fae_P.rett)
+E.fae_P.rett_coxph <- coxph(Surv(day, status) ~ absorbanceLog+primary + rep + primary:absorbanceLog + rep:absorbanceLog+rep:primary, data = E.fae_P.rett)
 summary(E.fae_P.rett_coxph)
 anova(E.fae_P.rett_coxph)
 
 E.fae_P.rett$factor_absorbanceLog <- as.factor(E.fae_P.rett$absorbanceLog)
 E.fae_P.rett$factor_dose <- as.factor(E.fae_P.rett$X2_dose)
 
-E.fae_P.rett_coxme <- coxme(Surv(day, status) ~ absorbanceLog * primary + (1 | rep/primary/factor_dose), data = E.fae_P.rett)
-summary(E.fae_P.rett_coxme)
-anova(E.fae_P.rett_coxme)
+#E.fae_P.rett_coxme <- coxme(Surv(day, status) ~ absorbanceLog * primary + (1 | rep/primary/factor_dose), data = E.fae_P.rett)
+#summary(E.fae_P.rett_coxme)
+#anova(E.fae_P.rett_coxme)
 
 #lm response is bacterial load
 #right of ~ is things that might influence the 
@@ -165,10 +165,11 @@ anova(P.rett_extremes_coxph)
 P.snee_extremes = subset(extreme_data, rep == "SM-sneebia_1" | rep == "SM-sneebia_2" | rep == "Fall 2020 exp 2" | rep == "Fall 2020 exp 4" | rep == "Fall 2020 exp 8")
 P.snee_extremes = subset(P.snee_extremes, secondary_dose != 0)
 P.snee_extremes$absorbanceLog <- log10(P.snee_extremes$secondary_dose)
+P.snee_extremes$absorbanceLog <- as.factor(P.snee_extremes$absorbanceLog)
 P.snee_extremes <- droplevels(P.snee_extremes)
 
 #Generate a Cox proportional Hazards model which assesses the contribution of infectious dose while controlling for replicate
-P.snee_extremes_coxph <- coxph(Surv(day, status) ~ rep+absorbanceLog+primary+rep:absorbanceLog+rep:primary+primary:absorbanceLog, data = P.snee_extremes)
+P.snee_extremes_coxph <- coxph(Surv(day, status) ~ absorbanceLog+primary+rep+primary:absorbanceLog+rep:absorbanceLog+rep:primary, data = P.snee_extremes)
 summary(P.snee_extremes_coxph)
 anova(P.snee_extremes_coxph)
 
