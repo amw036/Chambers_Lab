@@ -1,0 +1,48 @@
+---
+title: "ANOVA for primary vs control"
+author: "Madyline Lawrence"
+date: "7/14/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Interaction plots**
+
+Efae 
+
+```{r}
+interaction.plot(x.factor = E.fae_data$primary, trace.factor = factor(E.fae_data$dose), 
+                 response = log(E.fae_data$load))
+```
+
+S.m
+
+```{r}
+interaction.plot(x.factor = S.m_data$primary, trace.factor = S.m_data$secondary, 
+                 response = log(S.m_data$CFU_equiv))
+```
+
+
+**ANOVA Output**
+
+Efae
+
+```{r}
+e.fae.anov <- aov(log(load) ~ primary + factor(dose), data = E.fae_data)
+summary(e.fae.anov)
+TukeyHSD(e.fae.anov)
+
+```
+
+S.m
+
+```{r}
+s.m.anov <- aov(log(CFU_equiv) ~ primary + secondary, data = S.m_data)
+summary(s.m.anov)
+
+TukeyHSD(s.m.anov)
+
+```

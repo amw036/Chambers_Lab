@@ -1,0 +1,373 @@
+---
+title: "Logistic_models"
+author: "Madyline Lawrence"
+date: "7/14/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include = FALSE}
+# Importing packages needed
+
+library(gdata)
+library(ggplot2)
+library(stringr)
+library(boot)
+library(data.table)
+library(dplyr)
+library(formattable)
+library(tidyr)
+library(caret)
+library(questionr)
+library(DescTools)
+library(survival)
+```
+
+**Cleaning of data**
+
+```{r}
+rm(list=ls()) #removes all old variables
+E.fae_data_with2 = read.csv("E.fae resistance data.csv")
+E.fae_data = subset(E.fae_data_with2, dose != 2)
+S.m_data = read.csv("S.m resistance data.csv")
+
+```
+
+
+```{r, echo = FALSE}
+#import the dataset
+
+efdata = read.xls("ef_Complete Survival Data.xlsx")
+smdata = read.xls("sm_Complete Survival Data.xlsx")
+
+```
+
+```{r, echo = FALSE}
+#turns white spaces into nothing
+
+efdata = trim(efdata)
+smdata = trim(smdata) 
+```
+
+```{r, echo = FALSE}
+#changes all blank values to NA and exclude bad rows
+
+efdata[efdata==""] <- NA
+smdata[smdata==""] <- NA
+
+#ffdata[ffdata== "None" |ffdata== "Unknown" | ffdata == "Not Applicable"] <- NA
+
+efdata = efdata[,c(2,3,4,6,7,8,9,10,11,12,13)]
+smdata = smdata[,c(2,3,4,6,7,8,9,10,11,12,13)]
+```
+
+
+
+```{r, echo = FALSE}
+# remove rows without values for 0 and 10 hours
+
+efdata = efdata[!is.na(efdata$X0.hour),]
+efdata = efdata[!is.na(efdata$X10.hour),]
+
+smdata = smdata[!is.na(smdata$X0.hour),]
+smdata = smdata[!is.na(smdata$X10.hour),]
+```
+
+```{r, echo = FALSE}
+efdata$bin_primary = ifelse(efdata$primary == "E.fae", 1, 0)
+efdata$bin_alive3 = ifelse(efdata$alive3 == TRUE, 1, 0)
+
+smdata$bin_primary = ifelse(smdata$primary == "S.M", 1, 0)
+smdata$bin_alive3 = ifelse(smdata$alive3 == TRUE, 1, 0)
+```
+
+
+```{r, echo = FALSE}
+
+ef.bygroup = distinct(efdata, scientist,rep, primary, X2_dose, X0.hour, X10.hour, log10_10hour)
+
+
+sm.bygroup = distinct(smdata, scientist, rep, primary, X2_dose, X0.hour, X10.hour, log10_10hour)
+```
+
+
+
+#E.Fae Data:
+
+##Logistic Graph by chronic infection status Significance:
+
+
+
+```{r, echo = FALSE}
+
+PBS = efdata[efdata$primary == "PBS",]
+
+PBSlogit = glm(formula = alive3 ~ log10_10hour, family = "binomial", data = PBS)
+
+summary(PBSlogit)
+
+PseudoR2(PBSlogit)
+
+Cstat(PBSlogit)
+
+bact_val = seq(2,9,0.01)
+
+PBS_preds <- predict(PBSlogit, list(log10_10hour = bact_val), type = "response", se.fit = TRUE)
+
+
+
+
+Efae = efdata[efdata$primary == "E.fae",]
+
+Efaelogit = glm(formula = alive3 ~ log10_10hour, family = "binomial", data = Efae)
+
+summary(Efaelogit)
+
+Cstat(Efaelogit)
+
+Efae_preds <- predict(Efaelogit, list(log10_10hour = bact_val), type = "response")
+
+
+```
+
+
+##Values of Interest
+
+PBS curve point of inflection = 3.6822
+
+PBS hill slope = -0.15480
+
+E.fae curve point of inflection = 4.56533
+
+E.fae hill slope = -0.13400
+
+
+
+## Logistic Model Including Interaction Significance
+```{r, echo = FALSE}
+
+
+mylogit = glm(formula = bin_alive3 ~ log10_10hour + bin_primary + (bin_primary*log10_10hour), family = "binomial", data = efdata)
+
+summary(mylogit)
+
+Cstat(mylogit)
+
+```
+
+E.FAE IMAGES:
+
+
+
+```{r, echo = FALSE}
+PBS = efdata[efdata$primary == "PBS",]
+
+PBSlogit = glm(formula = alive3 ~ log10_10hour, family = "binomial", data = PBS)
+
+summary(PBSlogit)
+
+PseudoR2(PBSlogit)
+
+Cstat(PBSlogit)
+
+bact_val = seq(2,9,0.01)
+
+PBS_preds <- predict(PBSlogit, list(log10_10hour = bact_val), type = "response",se.fit =TRUE)
+
+PBS_upper = (PBS_preds$fit+1.96*PBS_preds$se.fit)
+PBS_lower = (PBS_preds$fit-1.96*PBS_preds$se.fit)
+
+Efae = efdata[efdata$primary == "E.fae",]
+
+Efaelogit = glm(formula = alive3 ~ log10_10hour, family = "binomial", data = Efae)
+
+
+
+summary(Efaelogit)
+
+Cstat(Efaelogit)
+
+Efae_preds <- predict(Efaelogit, list(log10_10hour = bact_val), type = "response",se.fit = TRUE)
+
+Efae_upper = (Efae_preds$fit+(1.96*Efae_preds$se.fit))
+Efae_lower = (Efae_preds$fit-(1.96*Efae_preds$se.fit))
+
+
+
+
+
+
+
+png(file="figure6_abbyfrank.png", width = 1500, height = 1500, res = 300)
+par(family = "Times")
+
+plot(0,0,xlim = c(2,9),ylim = c(0,1),type = "n",ylab= "Probability of Survival", xlab = expression("Log"[10]*"(10 Hour Bacterial Load)"))
+
+lines(PBS_preds$fit~bact_val,col="steelblue4", lwd = 2)
+
+lines(Efae_preds$fit~bact_val, col="steelblue2", lwd = 2)
+
+legend("topright", inset=.03, title="Primary Infection Group",c("PBS","E.faecalis"), fill=c("steelblue4","steelblue2"), horiz=TRUE,cex = 0.75)
+ 
+lines(bact_val, PBS_upper, lty=2, col="steelblue4")
+lines(bact_val, PBS_lower, lty=2,col="steelblue4")
+
+lines(bact_val, Efae_upper, lty=2, col="steelblue2")
+lines(bact_val, Efae_lower, lty=2, col="steelblue2")
+
+dev.off()
+
+
+
+```
+
+
+
+
+
+#SM DATA:
+
+##Logistic Graph by chronic infection status:
+
+```{r, echo = FALSE}
+
+PBS = smdata[smdata$primary == "PBS",]
+
+PBSlogit = glm(formula = alive3 ~ log10_10hour, family = "binomial", data = PBS)
+
+summary(PBSlogit)
+
+PseudoR2(PBSlogit)
+
+Cstat(PBSlogit)
+
+bact_val = seq(2,9,0.01)
+
+
+PBS_preds <- predict(PBSlogit, list(log10_10hour = bact_val), type = "response")
+
+
+
+
+SM = smdata[smdata$primary == "S.M",]
+
+SMlogit = glm(formula = alive3 ~ log10_10hour, family = "binomial", data = SM)
+
+summary(SMlogit)
+
+
+Cstat(SMlogit)
+
+SM_preds <- predict(SMlogit, list(log10_10hour = bact_val), type = "response")
+
+ggplot() + geom_line(aes(x = bact_val, y = PBS_preds, colour = "PBS")) + geom_line(aes(x = bact_val, y = SM_preds, colour = "SM")) + ylab("Probability of Survival") + xlab("Log (10 Hour Bacteria Amount)") 
+
+
+```
+
+
+##Values of Interest
+
+PBS curve point of inflection = 3.6981
+
+PBS hill slope = -0.26585
+
+S.M curve point of inflection = 5.71890
+
+S.M hill slope = -0.10105
+
+## Logistic Model Including Interaction Significance
+```{r, echo = FALSE}
+
+
+mylogit = glm(formula = bin_alive3 ~ log10_10hour + bin_primary + (bin_primary*log10_10hour), family = "binomial", data = smdata)
+
+summary(mylogit)
+
+Cstat(mylogit)
+
+```
+
+
+
+SM IMAGES:
+
+```{r, echo = FALSE}
+PBS = smdata[smdata$primary == "PBS",]
+
+PBSlogit = glm(formula = alive3 ~ log10_10hour, family = "binomial", data = PBS)
+
+summary(PBSlogit)
+
+PseudoR2(PBSlogit)
+
+Cstat(PBSlogit)
+
+bact_val = seq(2,9,0.01)
+
+
+PBS_preds <- predict(PBSlogit, list(log10_10hour = bact_val), type = "response", se.fit = TRUE)
+
+PBS_upper = (PBS_preds$fit+(1.96*PBS_preds$se.fit))
+PBS_lower = (PBS_preds$fit-(1.96*PBS_preds$se.fit))
+
+
+SM = smdata[smdata$primary == "S.M",]
+
+SMlogit = glm(formula = alive3 ~ log10_10hour, family = "binomial", data = SM)
+
+summary(SMlogit)
+
+
+Cstat(SMlogit)
+
+SM_preds <- predict(SMlogit, list(log10_10hour = bact_val), type = "response", se.fit = TRUE)
+
+SM_upper = (SM_preds$fit+(1.96*SM_preds$se.fit))
+SM_lower = (SM_preds$fit-(1.96*SM_preds$se.fit))
+
+
+png(file="figure13_abbyfrank.png", width = 1500, height = 1500, res = 300)
+par(family = "Times")
+
+
+
+plot(0,0,xlim = c(2,9),ylim = c(0,0.9),type = "n",ylab= "Probability of Survival", xlab = expression("Log"[10]*"(10 Hour Bacterial Load)"))
+
+lines(PBS_preds$fit~bact_val,col="steelblue4", lwd = 2)
+
+lines(SM_preds$fit~bact_val, col="steelblue2", lwd = 2)
+
+legend("topright", inset=.03, title="Primary Infection Group",c("PBS","S.marcescens"), fill=c("steelblue4","steelblue2"), horiz=TRUE,cex = 0.75)
+ 
+lines(bact_val, PBS_upper, lty=2, col="steelblue4")
+lines(bact_val, PBS_lower, lty=2, col="steelblue4")
+
+lines(bact_val, SM_upper, lty=2, col="steelblue2")
+lines(bact_val, SM_lower, lty=2, col="steelblue2")
+
+
+dev.off()
+
+
+```
+
+```{r}
+# Significance of control vs efae
+
+mylogit = glm(formula = alive3 ~ log10_10hour + primary, family = "binomial", data = efdata)
+
+summary(mylogit)
+
+
+# Significance of control vs sm
+
+mylogit = glm(formula = alive3 ~ log10_10hour + primary, family = "binomial", data = smdata)
+
+summary(mylogit)
+```
+
+
