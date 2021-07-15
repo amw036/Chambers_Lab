@@ -203,6 +203,8 @@ png(file="enough_S.m_P.rett_legend.png",width=1200,height=900,res=130)
 plot(0,0, type='n', bty = 'n', xaxt = 'n', yaxt = 'n')
 legend("topright",inset=0, bty="n" , c("PBS-P.rett 0.01", "PBS-P.rett 0.1", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "PBS-P.rett 3.0", "PBS-P.rett 5.0", "S.m-P.rett 0.01", "S.m-P.rett 0.1", "S.m-P.rett 1.0", "S.m-P.rett 2.0", "S.m-P.rett 3.0", "S.m-P.rett 5.0"),col=c("#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694", "black"),lty=c(3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1),lwd=5, cex=1)
 #dev.off()
+
+#write.csv(enough_S.m_P.rett, "S.m-P.rett.csv")
 ```
 
 Individual Replicates

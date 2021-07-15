@@ -1,0 +1,93 @@
+---
+title: "Protective Effect Paper"
+author: "Abigail Wukitch"
+date: "7/15/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, load libraries and data}
+library(survival)
+library(RColorBrewer)
+library(ggplot2)
+library(rlang)
+
+rm(list=ls()) #removes all old variables
+E.fae_P.rett = read.csv("E.fae-P.rett.csv")
+S.m_P.rett = read.csv("S.m-P.rett.csv")
+
+```
+
+```{r, E.fae-P.rett survival data}
+#THE GRAPH
+png(file="E.fae-P.rett.png", width=1200, heigh=900, res=130)
+par(mar=c(4,5,1,1)) #sets the margins around the graph so there is room for the labels
+plot(survfit(Surv(E.fae_P.rett$day, E.fae_P.rett$status) ~ E.fae_P.rett$primary + E.fae_P.rett$secondary_dose), 
+     col=c("#B5E8FC", "#09B6FC", "#055df5", "#0600a8"), #line color
+     lty=c(1, 1, 1, 1, 3, 3, 3, 3), #line type
+     lwd=5, #line width
+     yaxt='n', 
+     xaxt='n', 
+     ylab="proportion alive", #label for the y-axis
+     xlab="days post-secondary infection", #label for the x-axis
+     cex.lab=2.5, #font size of axis labels
+     xlim=c(0,7), #determines range of the x-axis
+     xaxs='i') #makes the data flush with the axis 
+axis(2, #left side
+     las=2, #perpendicular to the axis
+     cex.axis=1.5, #font size
+     lwd=5) #line width
+axis(1, #bottom of the graph
+     cex.axis=1.5, #font size
+     lwd=5) #line width
+box(lwd=5)
+
+#THE LEGEND
+#plot(0,0, type='n', bty = 'n', xaxt = 'n', yaxt = 'n')
+legend("topright", bty="n" , c("E.fae-P.rett 0.001", "E.fae-P.rett 0.01", "E.fae-P.rett 0.1", "E.fae-P.rett 1.0", "PBS-P.rett 0.001", "PBS-P.rett 0.01", "PBS-P.rett 0.1", 'PBS-P.rett 1.0'),col=c("#B5E8FC", "#09B6FC", "#055df5", "#0600a8"),lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=5, cex=1)
+
+#STATISTICS
+#Generate a Cox proportional Hazards model which assesses the contribution of infectious dose while controlling for replicate
+E.fae_P.rett$secondary_dose <- as.factor(E.fae_P.rett$secondary_dose)
+E.fae_P.rett_coxph <- coxph(Surv(day, status) ~ secondary_dose + primary + rep + primary:secondary_dose + rep:secondary_dose + rep:primary, data = E.fae_P.rett)
+summary(E.fae_P.rett_coxph)
+anova(E.fae_P.rett_coxph)
+```
+
+```{r, S.m-P.rett survival data}
+#THE GRAPH
+table(S.m_P.rett$primary, S.m_P.rett$secondary_dose)
+
+png(file="S.m_P.rett.png",width=1200,height=900,res=130)
+par(mar=c(4,5,1,1)) #sets the margins around the graph so there is room for the labels
+plot(survfit(Surv(S.m_P.rett$day, S.m_P.rett$status) ~ S.m_P.rett$primary + S.m_P.rett$secondary_dose), 
+     col=c("#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694", "black"), #colors of lines
+     lty=c(3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1), #type of line, 1 = solid, 3 = dashed
+     lwd=5, #line width
+     yaxt='n', 
+     xaxt='n', 
+     ylab="proportion alive", #label for the y-axis
+     xlab="days post-secondary infection", #label for the x-axis
+     cex.lab=2.5, #font size of axis labels
+     xlim=c(0,7), #determines range of the x-axis
+     xaxs='i') #makes the data flush with the axis 
+axis(2, #left side
+     las=2, #perpendicular to the axis
+     cex.axis=1.5, #font size
+     lwd=5) #line width
+axis(1, #bottom of the graph
+     cex.axis=1.5, #font size
+     lwd=5) #line width
+box(lwd=5)
+
+#run the plot below to create a blank plot for the legend
+#grab a screen shot of that and you can put the legend outside the graphing area
+png(file="enough_S.m_P.rett_legend.png",width=1200,height=900,res=130)
+plot(0,0, type='n', bty = 'n', xaxt = 'n', yaxt = 'n')
+legend("topright",inset=0, bty="n" , c("PBS-P.rett 0.01", "PBS-P.rett 0.1", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "PBS-P.rett 3.0", "PBS-P.rett 5.0", "S.m-P.rett 0.01", "S.m-P.rett 0.1", "S.m-P.rett 1.0", "S.m-P.rett 2.0", "S.m-P.rett 3.0", "S.m-P.rett 5.0"),col=c("#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694", "black"),lty=c(3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1),lwd=5, cex=1)
+
+
+```
