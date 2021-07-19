@@ -70,7 +70,7 @@ spring2021 = read.csv("Spring 2021 Summary.csv")
 E.fae_P.rett = subset(all_data, date == "6/18/18" | date == "6/20/18" | date == "6/22/18" | date == "6/25/18" | date == "7/19/18" | date == "7/23/18" | date == "6/3/19" | date == "6/5/19" | date == "6/11/19" | date == "7/1/19" | date == "7/3/19")
 
 #S.m-P.rett experiments (not including extremes)
-S.m_P.rett = subset(all_data, date == "6/28/18" | date == "7/10/18" | date == "8/1/18" | date == "8/2/18" | date == "8/6/18" | date == "6/14/19" | date == "6/17/19" | date == "6/25/19" | date == "6/27/19")
+S.m_P.rett = subset(all_data, date == "6/28/18" | date == "7/10/18" | date == "8/1/18" | date == "8/2/18" | date == "8/6/18" | date == "6/14/19" | date == "6/17/19" | date == "6/19/19" | date == "6/25/19" | date == "6/27/19")
 
 #P.rett extremes
 P.rett_extremes = subset(extreme_data, rep == "SM-P.rett_1" | rep == "SM-P.rett2" | rep == "Fall 2020 exp 1" | rep == "Fall 2020 exp 3" | rep == "Fall 2020 exp 5" | rep == "Fall 2020 exp 10")
@@ -157,6 +157,8 @@ axis(1,lwd=4, cex.axis=1)
 box(lwd=4)
 legend("bottomleft",inset=0.02, bty="n" , c("PBS-P.rett 0.001", "PBS-P.rett 0.01", "PBS-P.rett 0.1", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "S.m-P.rett 0.001", "S.m-P.rett 0.01", "S.m-P.rett 0.1", "S.m-P.rett 1.0", "S.m-P.rett 2.0"),col=c("#B5E8FC", "#75D6FD", "#09B6FC", "#006bb3", "black"),lty=c(3, 3, 3, 3, 3, 1, 1, 1, 1, 1),lwd=5, cex=1) #a plot for fun
 #dev.off()
+
+write.csv(S.m_P.rett, "S.m_P.rett_no_extremes.csv")
 
 ```
 **P.rett Extreme Experiments**

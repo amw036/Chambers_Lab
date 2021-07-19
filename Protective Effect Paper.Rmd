@@ -18,18 +18,20 @@ library(rlang)
 rm(list=ls()) #removes all old variables
 E.fae_P.rett = read.csv("E.fae-P.rett.csv")
 S.m_P.rett = read.csv("S.m-P.rett.csv")
+S.m_P.rett_no_extremes = read.csv("S.m_P.rett_no_extremes.csv")
 
 ```
 
 ```{r, E.fae-P.rett survival data}
-
+E.fae_P.rett$primary <- relevel(E.fae_P.rett$primary, "PBS")
 
 #THE GRAPH
+table(E.fae_P.rett$primary, E.fae_P.rett$secondary_dose)
 png(file="E.fae-P.rett.png", width=1200, heigh=900, res=130)
 par(mar=c(4,5,1,1)) #sets the margins around the graph so there is room for the labels
 plot(survfit(Surv(E.fae_P.rett$day, E.fae_P.rett$status) ~ E.fae_P.rett$primary + E.fae_P.rett$secondary_dose), 
      col=c("#B5E8FC", "#09B6FC", "#055df5", "#0600a8"), #line color
-     lty=c(1, 1, 1, 1, 3, 3, 3, 3), #line type
+     lty=c(3, 3, 3, 3, 1, 1, 1, 1), #line type
      lwd=5, #line width
      yaxt='n', 
      xaxt='n', 
@@ -49,7 +51,7 @@ box(lwd=5)
 
 #THE LEGEND
 #plot(0,0, type='n', bty = 'n', xaxt = 'n', yaxt = 'n')
-legend("topright", bty="n" , c("E.fae-P.rett 0.001", "E.fae-P.rett 0.01", "E.fae-P.rett 0.1", "E.fae-P.rett 1.0", "PBS-P.rett 0.001", "PBS-P.rett 0.01", "PBS-P.rett 0.1", 'PBS-P.rett 1.0'),col=c("#B5E8FC", "#09B6FC", "#055df5", "#0600a8"),lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=5, cex=1)
+legend("topright", bty="n" , c("PBS-P.rett 0.001", "PBS-P.rett 0.01", "PBS-P.rett 0.1", 'PBS-P.rett 1.0', "E.fae-P.rett 0.001", "E.fae-P.rett 0.01", "E.fae-P.rett 0.1", "E.fae-P.rett 1.0"),col=c("#B5E8FC", "#09B6FC", "#055df5", "#0600a8"),lty=c(3, 3, 3, 3, 1, 1, 1, 1),lwd=5, cex=1)
 
 #STATISTICS
 #Generate a Cox proportional Hazards model which assesses the contribution of infectious dose while controlling for replicate
@@ -60,10 +62,12 @@ anova(E.fae_P.rett_coxph)
 ```
 
 ```{r, S.m-P.rett survival data}
+S.m_P.rett$primary <- relevel(S.m_P.rett$primary, "PBS")
+
 #THE GRAPH
 table(S.m_P.rett$primary, S.m_P.rett$secondary_dose)
 
-#png(file="S.m_P.rett.png",width=1200,height=900,res=130)
+png(file="S.m_P.rett.png",width=1200,height=900,res=130)
 par(mar=c(4,5,1,1)) #sets the margins around the graph so there is room for the labels
 plot(survfit(Surv(S.m_P.rett$day, S.m_P.rett$status) ~ S.m_P.rett$primary + S.m_P.rett$secondary_dose), col=c("#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694", "black"), lty=c(3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1), lwd=5,yaxt='n', xaxt='n', ylab="proportion alive", xlab="days post-secondary infection", cex.lab=2.5, xlim=c(0,7), xaxs='i') 
 axis(2, las=2, cex.axis=1.5, lwd=5)
@@ -74,6 +78,30 @@ box(lwd=5)
 #png(file="S.m_P.rett_legend.png",width=1200,height=900,res=130)
 #plot(0,0, type='n', bty = 'n', xaxt = 'n', yaxt = 'n')
 legend("topright",inset=0, bty="n" , c("PBS-P.rett 0.01", "PBS-P.rett 0.1", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "PBS-P.rett 3.0", "PBS-P.rett 5.0", "S.m-P.rett 0.01", "S.m-P.rett 0.1", "S.m-P.rett 1.0", "S.m-P.rett 2.0", "S.m-P.rett 3.0", "S.m-P.rett 5.0"),col=c("#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694", "black"),lty=c(3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1),lwd=5, cex=1)
+
+#STATISTICS
+S.m_P.rett$secondary_dose <- as.factor(S.m_P.rett$secondary_dose)
+S.m_P.rett_coxph <- coxph(Surv(day, status) ~ secondary_dose + primary + rep + primary:secondary_dose + rep:secondary_dose + rep:primary, data = S.m_P.rett)
+summary(S.m_P.rett_coxph)
+anova(S.m_P.rett_coxph)
+```
+
+```{r, S.m-P.rett no extremes survival data}
+S.m_P.rett_no_extremes$primary <- relevel(S.m_P.rett_no_extremes$primary, "PBS")
+S.m_P.rett_no_extremes <- subset(S.m_P.rett_no_extremes, Scientist == "Abby")
+
+#THE GRAPH
+png(file="S.m_P.rett_no_extremes.png",width=1200,height=900,res=130)
+par(mar=c(4,5,1,1)) #sets the margins around the graph so there is room for the labels
+plot(survfit(Surv(S.m_P.rett_no_extremes$day, S.m_P.rett_no_extremes$status) ~ S.m_P.rett_no_extremes$primary + S.m_P.rett_no_extremes$secondary_dose), col=c("#B5E8FC",  "#09B6FC", "#055df5", "#003694", "black"), lty=c(3, 3, 3, 3, 3, 1, 1, 1, 1, 1), lwd=5,yaxt='n', xaxt='n', ylab="proportion alive", xlab="days post-secondary infection", cex.lab=2.5, xlim=c(0,7), xaxs='i') 
+axis(2, las=2, cex.axis=1.5, lwd=5)
+axis(1, cex.axis=1.5, lwd=5)
+box(lwd=5)
+
+#THE LEGEND
+#png(file="S.m_P.rett_legend.png",width=1200,height=900,res=130)
+#plot(0,0, type='n', bty = 'n', xaxt = 'n', yaxt = 'n')
+legend("topright",inset=0, bty="n" , c("PBS-P.rett 0.001", "PBS-P.rett 0.01", "PBS-P.rett 0.1", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "S.m-P.rett 0.001", "S.m-P.rett 0.01", "S.m-P.rett 0.1", "S.m-P.rett 1.0", "S.m-P.rett 2.0"),col=c("#B5E8FC", "#09B6FC", "#055df5", "#003694", "black"),lty=c(3, 3, 3, 3, 3, 1, 1, 1, 1, 1),lwd=5, cex=1)
 
 #STATISTICS
 S.m_P.rett$secondary_dose <- as.factor(S.m_P.rett$secondary_dose)
