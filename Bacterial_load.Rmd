@@ -45,14 +45,20 @@ S.m
 ```{r Bacterial load box and whisker}
 table(S.m_data$primary, S.m_data$secondary)
 
-png(file="S.m_bacterial_load.png",width=1200,height=900,res=130)
-ggplot(S.m_data, aes(x = secondary, y = log(CFU_equiv), fill = factor(primary, levels = c("chronically infected", "control")))) +
-  scale_fill_manual(values=c("#055df5","gray")) +
+png(file="S.m_bacterial_load.png",width=1500,height=900,res=130)
+ggplot(S.m_data, aes(x = secondary, y = log(CFU_equiv), fill = factor(primary, levels = c("s.m 0.1", "control")))) +
+  scale_fill_manual(values=c("#055df5","gray"), name = "Primary", labels = c("Chronically infected", "Control")) +
+  theme(legend.position = "top") +
   geom_boxplot() + 
   theme_classic(base_size = 25) + 
-  xlab("secondary dose of P. rettgeri") +
+  xlab("Secondary dose of P. rettgeri") +
   ylab("log(calculated bacterial load)") + 
-  scale_x_discrete(labels = c("0.001", "0.01", "0.1", "1.0", "2.0")) +
+  scale_x_discrete(labels = c("0.001", "0.01", "0.1", "1.0", "2.0")) 
   #geom_point(aes(fill=primary), size = 1.6, position=position_jitterdodge()) + 
-  guides(fill=guide_legend(title="primary"))
+  #guides(fill=guide_legend(title="primary")) +
+  #scale_fill_discrete(name = "Primary", labels = c("Chronically infected", "Control"))
+
+#legend("topright", bty="n", c("Chronically infected", "Control"))
+
+#legend("topright", bty="n" , c("E.fae-P.rett 0.001", "E.fae-P.rett 0.01", "E.fae-P.rett 0.1", "E.fae-P.rett 1.0", "PBS-P.rett 0.001", "PBS-P.rett 0.01", "PBS-P.rett 0.1", 'PBS-P.rett 1.0'),col=c("#B5E8FC", "#09B6FC", "#055df5", "#0600a8"),lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=5, cex=1)
 ```
