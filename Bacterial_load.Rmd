@@ -31,7 +31,7 @@ table(E.fae_data$dose)
 
 png(file="E.fae_bacterial_load.png",width=1200,height=900,res=130)
 ggplot(E.fae_data, aes(x = as.character(dose), y = log(load), fill = primary)) +
-  scale_fill_manual(values=c("#09B6FC", "gray")) +
+  scale_fill_manual(values=c("#055df5", "gray")) +
   geom_boxplot() + 
   theme_classic(base_size = 25) + 
   xlab("secondary dose of P. rettgeri") +
@@ -46,16 +46,13 @@ S.m
 table(S.m_data$primary, S.m_data$secondary)
 
 png(file="S.m_bacterial_load.png",width=1200,height=900,res=130)
-ggplot(S.m_data, aes(x = secondary, y = log(CFU_equiv), fill = factor(primary, levels = c("s.m 0.1", "control")))) +
-  scale_fill_manual(values=c("#09B6FC","gray")) +
+ggplot(S.m_data, aes(x = secondary, y = log(CFU_equiv), fill = factor(primary, levels = c("chronically infected", "control")))) +
+  scale_fill_manual(values=c("#055df5","gray")) +
   geom_boxplot() + 
   theme_classic(base_size = 25) + 
   xlab("secondary dose of P. rettgeri") +
   ylab("log(calculated bacterial load)") + 
   scale_x_discrete(labels = c("0.001", "0.01", "0.1", "1.0", "2.0")) +
-  geom_point(aes(fill=primary), size = 1.6, position=position_jitterdodge()) + 
+  #geom_point(aes(fill=primary), size = 1.6, position=position_jitterdodge()) + 
   guides(fill=guide_legend(title="primary"))
-
-
-
 ```
