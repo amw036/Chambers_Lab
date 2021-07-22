@@ -19,7 +19,8 @@ rm(list=ls()) #removes all old variables
 E.fae_P.rett = read.csv("E.fae-P.rett.csv")
 S.m_P.rett = read.csv("S.m-P.rett.csv")
 S.m_P.rett_no_extremes = read.csv("S.m_P.rett_no_extremes.csv")
-
+S.m_P.snee = read.csv("S.m-P.snee.csv")
+P.snee_varied_primary = read.csv("S.m_P.snee_varied_primary.csv")
 ```
 
 ```{r, E.fae-P.rett survival data}
@@ -108,4 +109,64 @@ S.m_P.rett_no_extremes$secondary_dose <- as.factor(S.m_P.rett_no_extremes$second
 S.m_P.rett_no_extremes_coxph <- coxph(Surv(day, status) ~ secondary_dose + primary + rep + primary:secondary_dose + rep:secondary_dose + rep:primary, data = S.m_P.rett_no_extremes)
 summary(S.m_P.rett_no_extremes_coxph)
 anova(S.m_P.rett_no_extremes_coxph)
+```
+
+```{r, S.m-P.snee survival data}
+table(S.m_P.snee$primary, S.m_P.snee$secondary_dose)
+S.m_P.snee = subset(S.m_P.snee, primary != 0)
+
+png(file="S.m_P.snee.png",  width = 1700, height = 1500, res = 300)
+#par(mar=c(4,4,0.1,0.1)) #sets the margins around the graph so there is room for the labels
+plot(survfit(Surv(S.m_P.snee$hour, S.m_P.snee$status) ~ S.m_P.snee$primary + S.m_P.snee$secondary_dose),
+     col=c("#B5E8FC", "#75D6FD", "#09B6FC", "#055df5"), 
+     lty=c(1, 1, 1, 1, 3, 3, 3, 3),
+     lwd=3.7,
+     yaxt='n',
+     xaxt='n',
+     ylab="Proportion Alive", #label for the y-axis
+     xlab="Hours Post-Secondary Infection", #label for the x-axis
+     cex.lab=1.3, #font size of axis labels
+     xlim=c(10,48), #determines range of the x-axis
+     xaxs='i', #makes the data flush with the axis
+     ylim=c(0, 1.05), 
+     yaxs='i') #makes the data flush with the axis 
+axis(2, #left side
+     las=2, #perpendicular to the axis
+     cex.axis=1, #font size
+     lwd=4.5) #line width
+axis(1, #bottom of the graph
+     cex.axis=1, #font size
+     lwd=4.5) #line width
+box(lwd=4.5)
+
+legend("bottomleft", bty="n" , c("0.001", "PBS-0.01", "PBS-0.1", "PBS-1.0", "S.m-0.001", "S.m-0.01", "S.m-0.1", "S.m-1.0"),col=c("#B5E8FC", "#75D6FD", "#09B6FC", "#055df5"), lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=4, cex=1)
+```
+```{r, S.m-P.snee varied primary survival data}
+P.snee_varied_primary = subset(P.snee_varied_primary, secondary == "P.snee")
+
+png(file="P.snee_varied_primary.png",  width = 1700, height = 1500, res = 300)
+#par(mar=c(4,4,0.1,0.1)) #sets the margins around the graph so there is room for the labels
+plot(survfit(Surv(P.snee_varied_primary$hour, P.snee_varied_primary$status) ~ P.snee_varied_primary$condition),
+     col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"), 
+     lty=c(3, 1, 1, 1, 1, 1),
+     lwd=3.4,
+     yaxt='n',
+     xaxt='n',
+     ylab="Proportion Alive", #label for the y-axis
+     xlab="Hours Post-Secondary Infection", #label for the x-axis
+     cex.lab=1.3, #font size of axis labels
+     xlim=c(10,48), #determines range of the x-axis
+     xaxs='i', #makes the data flush with the axis
+     ylim=c(0, 1.05), 
+     yaxs='i') #makes the data flush with the axis 
+axis(2, #left side
+     las=2, #perpendicular to the axis
+     cex.axis=1, #font size
+     lwd=4.5) #line width
+axis(1, #bottom of the graph
+     cex.axis=1, #font size
+     lwd=4.5) #line width
+box(lwd=4.5)
+
+legend("bottomleft", bty="n" , c("PBS-P.snee 2.0", "S.m 0.001-P.snee 2.0", "S.m 0.01-P.snee 2.0", "S.m 0.1-P.snee 2.0", "S.m 1.0- P.snee 2.0", "S.m 2.0-P.snee 2.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"),lty=c(3, 1, 1, 1, 1, 1),lwd=5, cex=1)
 ```

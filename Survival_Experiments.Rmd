@@ -141,8 +141,6 @@ legend("topright", bty="n" , c("E.fae-P.rett 0.001", "E.fae-P.rett 0.01", "E.fae
 #dev.off()
 ```
 
-
-
 **S.m-P.rett Experiments**
 extremes not included
 individual replicates not included
@@ -572,5 +570,5 @@ box(lwd=5)
 
 #png(file="P.rett_Varied_primary_legend.png",width=1200,height=900,res=130)
 #plot(0,0, type='n', bty = 'n', xaxt = 'n', yaxt = 'n')
-legend("bottomleft", bty="n" , c("PBS-PBS", "PBS-P.snee 2.0", "S.m 0.001-P.snee 2.0", "S.m 0.01-P.snee 2.0", "S.m 0.1-P.snee 2.0", "S.m 1.0- P.snee 2.0", "S.m 2.0-P.snee 2.0"),col=c("gray", "gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"),lty=c(4, 3, 1, 1, 1, 1, 1),lwd=5, cex=1) #a plot for fun
+legend("bottomleft", bty="n" , c("PBS-PBS", "PBS-P.snee 2.0", "S.m 0.001-P.snee 2.0", "S.m 0.01-P.snee 2.0", "S.m 0.1-P.snee 2.0", "S.m 1.0- P.snee 2.0", "S.m 2.0-P.snee 2.0"),col=c("gray", "gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"),lty=c(4, 3, 1, 1, 1, 1, 1),lwd=5, cex=2) #a plot for fun
 ```

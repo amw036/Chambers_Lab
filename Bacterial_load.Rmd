@@ -47,12 +47,12 @@ table(S.m_data$primary, S.m_data$secondary)
 
 png(file="S.m_bacterial_load.png",width=1500,height=900,res=130)
 ggplot(S.m_data, aes(x = secondary, y = log(CFU_equiv), fill = factor(primary, levels = c("s.m 0.1", "control")))) +
-  scale_fill_manual(values=c("#055df5","gray"), name = "Primary", labels = c("Chronically infected", "Control")) +
-  theme(legend.position = "top") +
+  scale_fill_manual(values=c("#699ef9","gray"), name = "Primary", labels = c("Chronically infected", "Control")) +
+  theme_classic(base_size = 25) +
+  theme(axis.text = element_text(color = "black")) +
   geom_boxplot() + 
-  theme_classic(base_size = 25) + 
   xlab("Secondary dose of P. rettgeri") +
-  ylab("log(calculated bacterial load)") + 
+  ylab(expression("Log"[10]*"(Bacterial Load 10 HPI)")) + 
   scale_x_discrete(labels = c("0.001", "0.01", "0.1", "1.0", "2.0")) 
   #geom_point(aes(fill=primary), size = 1.6, position=position_jitterdodge()) + 
   #guides(fill=guide_legend(title="primary")) +
