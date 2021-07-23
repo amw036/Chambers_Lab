@@ -17,8 +17,7 @@ library(ggplot2)
 library(agricolae)
 
 rm(list=ls()) #removes all old variables
-E.fae_data_with2 = read.csv("E.fae resistance data.csv")
-E.fae_data = subset(E.fae_data_with2, dose != 2)
+E.fae_data = read.csv("E.fae resistance data.csv")
 S.m_data = read.csv("S.m resistance data.csv")
 
 ```
@@ -27,10 +26,11 @@ S.m_data = read.csv("S.m resistance data.csv")
 
 E.fae
 ```{r Bacterial load box and whisker}
-table(E.fae_data$dose)
+table(E.fae_data$secondary_dose)
+E.fae_data$primary <- relevel(E.fae_data$primary, "PBS")
 
 png(file="E.fae_bacterial_load.png",width=1200,height=900,res=130)
-ggplot(E.fae_data, aes(x = as.character(dose), y = log(load), fill = primary)) +
+ggplot(E.fae_data, aes(x = as.character(secondary_dose), y = log(load), fill = primary)) +
   scale_fill_manual(values=c("#055df5", "gray")) +
   geom_boxplot() + 
   theme_classic(base_size = 25) + 

@@ -26,33 +26,40 @@ P.snee_varied_primary = read.csv("S.m_P.snee_varied_primary.csv")
 ```{r, E.fae-P.rett survival data}
 E.fae_P.rett$primary <- relevel(E.fae_P.rett$primary, "PBS")
 
-#THE GRAPH
-table(E.fae_P.rett$primary, E.fae_P.rett$secondary_dose)
-png(file="E.fae-P.rett.png", width=1200, heigh=900, res=130)
+#KAPLAN MEIER
+table(E.fae_P.rett$primary, E.fae_P.rett$secondary_dose) #tells you the number of flies in each condition
+png(file="E.fae-P.rett.png", width=1200, heigh=900, res=130) #determines where the graph will be saved
 par(mar=c(4,5,1,1)) #sets the margins around the graph so there is room for the labels
+#The graph
 plot(survfit(Surv(E.fae_P.rett$day, E.fae_P.rett$status) ~ E.fae_P.rett$primary + E.fae_P.rett$secondary_dose), 
      col=c("#B5E8FC", "#09B6FC", "#055df5", "#0600a8"), #line color
      lty=c(3, 3, 3, 3, 1, 1, 1, 1), #line type
      lwd=5, #line width
-     yaxt='n', 
-     xaxt='n', 
+     yaxt='n', #hide the y axis so I can customize it
+     xaxt='n', #hide the x axis so I can customize itS
      ylab="proportion alive", #label for the y-axis
      xlab="days post-secondary infection", #label for the x-axis
      cex.lab=2.5, #font size of axis labels
      xlim=c(0,7), #determines range of the x-axis
      xaxs='i') #makes the data flush with the axis 
+#Y axis
 axis(2, #left side
      las=2, #perpendicular to the axis
      cex.axis=1.5, #font size
      lwd=5) #line width
+#X axis
 axis(1, #bottom of the graph
      cex.axis=1.5, #font size
      lwd=5) #line width
 box(lwd=5)
-
-#THE LEGEND
-#plot(0,0, type='n', bty = 'n', xaxt = 'n', yaxt = 'n')
-legend("topright", bty="n" , c("PBS-P.rett 0.001", "PBS-P.rett 0.01", "PBS-P.rett 0.1", 'PBS-P.rett 1.0', "E.fae-P.rett 0.001", "E.fae-P.rett 0.01", "E.fae-P.rett 0.1", "E.fae-P.rett 1.0"),col=c("#B5E8FC", "#09B6FC", "#055df5", "#0600a8"),lty=c(3, 3, 3, 3, 1, 1, 1, 1),lwd=5, cex=1)
+#The legend
+legend("topright", #location
+       bty="n", #no box around the legend
+       c("PBS-P.rett 0.001", "PBS-P.rett 0.01", "PBS-P.rett 0.1", 'PBS-P.rett 1.0', "E.fae-P.rett 0.001", "E.fae-P.rett 0.01", "E.fae-P.rett 0.1", "E.fae-P.rett 1.0"), #labels in the legend
+       col=c("#B5E8FC", "#09B6FC", "#055df5", "#0600a8"), #colors for the legend lines, cycles through
+       lty=c(3, 3, 3, 3, 1, 1, 1, 1), #line type for legend lines
+       lwd=5, #line width for legend lines
+       cex=1) #font size
 
 #STATISTICS
 #Generate a Cox proportional Hazards model which assesses the contribution of infectious dose while controlling for replicate
@@ -140,6 +147,12 @@ axis(1, #bottom of the graph
 box(lwd=4.5)
 
 legend("bottomleft", bty="n" , c("0.001", "PBS-0.01", "PBS-0.1", "PBS-1.0", "S.m-0.001", "S.m-0.01", "S.m-0.1", "S.m-1.0"),col=c("#B5E8FC", "#75D6FD", "#09B6FC", "#055df5"), lty=c(1, 1, 1, 1, 3, 3, 3, 3),lwd=4, cex=1)
+
+#STATISTICS
+S.m_P.snee$secondary_dose <- as.factor(S.m_P.snee$secondary_dose)
+S.m_P.snee_coxph <- coxph(Surv(day, status) ~ secondary_dose + primary + rep + primary:secondary_dose + rep:secondary_dose + rep:primary, data = S.m_P.snee)
+summary(S.m_P.snee_coxph)
+anova(S.m_P.snee_coxph)
 ```
 ```{r, S.m-P.snee varied primary survival data}
 P.snee_varied_primary = subset(P.snee_varied_primary, secondary == "P.snee")
