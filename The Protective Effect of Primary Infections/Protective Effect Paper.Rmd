@@ -19,28 +19,10 @@ rm(list=ls()) #removes all old variables
 E.fae_P.rett = read.csv("E.fae-P.rett.csv")
 S.m_P.rett_no_extremes = read.csv("S.m-P.rett no extremes.csv")
 S.m_P.rett_extremes = read.csv("S.m-P.rett extremes.csv")
-#S.m_P.snee = read.csv("S.m-P.snee.csv")
-#P.snee_varied_primary = read.csv("S.m_P.snee_varied_primary.csv")
+S.m_P.snee = read.csv("S.m-P.snee.csv")
+P.rett_varied_primary = read.csv("Varied primary S.m-P.rett")
+P.snee_varied_primary = read.csv("Varied primary S.m-P.snee")
 ```
-```{r, fix csv}
-S.m_P.rett_extremes <- S.m_P.rett_extremes
-
-mutate(
-        S.m_P.rett_extremes,
-        if_else(S.m_P.rett_extremes$day > 3, TRUE, FALSE))
-
-if (S.m_P.rett_extremes$day > 3) {
-        S.m_P.rett_extremes$alive3 == TRUE
-} else {
-        S.m_P.rett_extremes$alive3 == FALSE
-}
-
-table(S.m_P.rett_extremes$day)
-
-write.csv(S.m_P.rett_extremes, file = "S.m-P.rett extremes.csv")
-
-```
-
 
 ```{r, E.fae-P.rett survival data}
 E.fae_P.rett$primary <- relevel(E.fae_P.rett$primary, "PBS")
