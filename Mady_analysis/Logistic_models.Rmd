@@ -86,22 +86,44 @@ Efaelogit = glm(formula = alive3 ~ log10_10hour, family = "binomial", data = Efa
 summary(Efaelogit)
 Cstat(Efaelogit)
 
+table(efdata$primary)
+
 Efae_preds <- predict(Efaelogit, list(log10_10hour = bact_val), type = "response",se.fit = TRUE)
 Efae_upper = (Efae_preds$fit+(1.96*Efae_preds$se.fit))
 Efae_lower = (Efae_preds$fit-(1.96*Efae_preds$se.fit))
 
-
-png(file="figure6_abbyfrank.png", width = 1500, height = 1500, res = 300)
+png(file="E.fae_tolerance_curve.png", width = 1500, height = 1500, res = 300)
 par(family = "Times")
-plot(0,0,xlim = c(2,9),ylim = c(0,1),type = "n",ylab= "Probability of Survival", xlab = expression("Log"[10]*"(10 Hour Bacterial Load)"))
-lines(PBS_preds$fit~bact_val,col="steelblue4", lwd = 2)
-lines(Efae_preds$fit~bact_val, col="steelblue2", lwd = 2)
+plot(0,0, type = "n",
+    bty = "n",
+    lwd=2, #line width
+    yaxt='n',
+    xaxt='n',
+    ylab="Probability of Survival", #label for the y-axis
+    xlab=expression("Log"[10]*"(Bacterial Load 10 HPI)"), #label for the x-axis
+    cex.lab=1.3, #font size of axis labels
+    xlim = c(2, 9), #determines range of the x-axis
+    xaxs='i', #makes the data flush with the axis 
+    ylim = c(0, 1), #determines range of the y-axis
+    yaxs='i') #makes the data flush with the axis
+axis(2, #left side
+     las=2, #perpendicular to the axis
+     cex.axis=1, #font size
+     lwd=2) #line width
+axis(1, #bottom of the graph
+     cex.axis=1, #font size
+     lwd=2) #line width
 
-legend("topright", inset=.03, title="Primary Infection Group",c("PBS","E.faecalis"), fill=c("steelblue4","steelblue2"), horiz=TRUE,cex = 0.75)
-lines(bact_val, PBS_upper, lty=2, col="steelblue4")
-lines(bact_val, PBS_lower, lty=2,col="steelblue4")
-lines(bact_val, Efae_upper, lty=2, col="steelblue2")
-lines(bact_val, Efae_lower, lty=2, col="steelblue2")
+polygon(c(bact_val, rev(bact_val)), c(PBS_upper, rev(PBS_lower)), border = NA, col = adjustcolor("gray", alpha.f=0.6))
+polygon(c(bact_val, rev(bact_val)), c(Efae_upper, rev(Efae_lower)), border = NA, col = adjustcolor("#055df5", alpha.f=0.6))
+lines(PBS_preds$fit~bact_val,col="gray", lwd = 3)
+lines(Efae_preds$fit~bact_val, col="#055df5", lwd = 3)
+
+legend("topright", c("Chronically infected", "Control"), col=c("#055df5","gray"), lwd = 3, cex = 1.3, bty = "n")
+lines(bact_val, PBS_upper, lty=1, lwd = 1, col=adjustcolor("gray", alpha.f=0.7))
+lines(bact_val, PBS_lower, lty=1, lwd = 1, col=adjustcolor("gray", alpha.f=0.7))
+lines(bact_val, Efae_upper, lty=1, lwd = 1, col=adjustcolor("#055df5", alpha.f=0.7))
+lines(bact_val, Efae_lower, lty=1, lwd = 1, col=adjustcolor("#055df5", alpha.f=0.7))
 dev.off()
 ```
 
@@ -160,7 +182,7 @@ SM_preds <- predict(SMlogit, list(log10_10hour = bact_val), type = "response", s
 SM_upper = (SM_preds$fit+(1.96*SM_preds$se.fit))
 SM_lower = (SM_preds$fit-(1.96*SM_preds$se.fit))
 
-png(file="figure13_abbyfrank.png", width = 1500, height = 1500, res = 300)
+png(file="S.m_tolerance_curve.png", width = 1500, height = 1500, res = 300)
 par(family = "Times")
 plot(0,0, type = "n",
     bty = "n",

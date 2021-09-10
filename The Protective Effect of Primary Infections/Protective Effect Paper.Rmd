@@ -135,16 +135,23 @@ anova(S.m_P.snee_coxph)
 
 ```{r, S.m-P.rett varied primary survival data}
 P.rett_varied_primary = subset(P.rett_varied_primary, secondary == "P.rett")
-table(P.rett_varied_primary$condition)
+table(P.rett_varied_primary$primary_dose)
+P.rett_varied_primary$primary_dose <- factor(P.rett_varied_primary$primary_dose)
 
 png(file="P.rett_varied_primary.png",  width = 1700, height = 1500, res = 300)
 #par(mar=c(4,4,0.1,0.1)) #sets the margins around the graph so there is room for the labels
-plot(survfit(Surv(P.rett_varied_primary$day, P.rett_varied_primary$status) ~ P.rett_varied_primary$condition), col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"), lty=c(1, 1, 1, 1, 1, 1), lwd=3.4, yaxt='n', xaxt='n', ylab="Proportion Alive", xlab="Days Post-Secondary Infection", cex.lab=1.3, xlim=c(0,7), xaxs='i', ylim=c(0, 1.05), yaxs='i')  
+plot(survfit(Surv(P.rett_varied_primary$day, P.rett_varied_primary$status) ~ P.rett_varied_primary$primary_dose), col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"), lty=c(1, 1, 1, 1, 1, 1), lwd=3.4, yaxt='n', xaxt='n', ylab="Proportion Alive", xlab="Days Post-Secondary Infection", cex.lab=1.3, xlim=c(0,7), xaxs='i', ylim=c(0, 1.05), yaxs='i')  
 axis(2, las=2, cex.axis=1, lwd=4.5) 
 axis(1, cex.axis=1, lwd=4.5)
 box(lwd=4.5)
 
 legend("bottomleft", bty="n" , c("PBS-P.rett 2.0", "S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0-P.rett 2.0", "S.m 2.0-P.rett 2.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"),lty=c(1, 1, 1, 1, 1, 1),lwd=5, cex=1)
+
+#STATISTICS
+#Generate a Cox proportional Hazards model which assesses the contribution of infectious dose while controlling for replicate
+P.rett_varied_primary_coxph <- coxph(Surv(day, status) ~ primary_dose + rep + rep*primary_dose, data = P.rett_varied_primary)
+summary(P.rett_varied_primary_coxph)
+anova(P.rett_varied_primary_coxph)
 ```
 
 ```{r, S.m-P.snee varied primary survival data}
