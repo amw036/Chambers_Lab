@@ -14,10 +14,13 @@ library(survival)
 library(RColorBrewer)
 library(ggplot2)
 library(rlang)
+library(agricolae)
 
 rm(list=ls()) #removes all old variables
 E.fae_P.rett = read.csv("E.fae-P.rett.csv")
+E.fae_bacterial_load = read.csv("E.fae bacterial load data.csv")
 S.m_P.rett_no_extremes = read.csv("S.m-P.rett no extremes.csv")
+S.m_bacterial_load = read.csv("S.m bacterial load data.csv")
 S.m_P.rett_extremes = read.csv("S.m-P.rett extremes.csv")
 S.m_P.snee = read.csv("S.m-P.snee.csv")
 P.rett_varied_primary = read.csv("Varied primary S.m-P.rett.csv")
@@ -25,7 +28,11 @@ P.snee_varied_primary = read.csv("Varied primary S.m-P.snee.csv")
 ```
 
 ```{r, E.fae-P.rett survival data}
-E.fae_P.rett$primary <- relevel(E.fae_P.rett$primary, "PBS")
+E.fae_P.rett$primary <- ordered(E.fae_P.rett$primary, levels = c("PBS", "E.fae"))
+table(E.fae_P.rett$primary, E.fae_P.rett$secondary_dose)
+
+E.fae_bacterial_load$primary <- ordered(E.fae_bacterial_load$primary, levels = c("PBS", "E.fae"))
+table(E.fae_bacterial_load$primary, E.fae_bacterial_load$secondary_dose)
 
 #KAPLAN MEIER
 table(E.fae_P.rett$primary, E.fae_P.rett$secondary_dose) #tells you the number of flies in each condition
@@ -68,11 +75,24 @@ E.fae_P.rett$secondary_dose <- as.factor(E.fae_P.rett$secondary_dose)
 E.fae_P.rett_coxph <- coxph(Surv(day, status) ~ secondary_dose + primary + rep + primary:secondary_dose + rep:secondary_dose + rep:primary, data = E.fae_P.rett)
 summary(E.fae_P.rett_coxph)
 anova(E.fae_P.rett_coxph)
+
+#BACTERIAL LOAD
+png(file="E.fae_P.rett_bacterial_load.png",width=1200,height=900,res=130)
+ggplot(E.fae_bacterial_load, aes(x = as.character(secondary_dose), y = log10_10hour, fill = primary)) +
+  scale_fill_manual(values=c("gray", "#055df5")) +
+  geom_boxplot() + 
+  theme_classic(base_size = 25) + 
+  xlab("secondary dose of P. rettgeri") +
+  ylab("log(calculated bacterial load)") +
+  geom_point(aes(color = primary), size = 1.1, position=position_jitterdodge())
 ```
 
 ```{r, S.m-P.rett no extremes survival data}
-S.m_P.rett_no_extremes$primary <- relevel(S.m_P.rett_no_extremes$primary, "PBS")
+S.m_P.rett_no_extremes$primary <- ordered(S.m_P.rett_no_extremes$primary, levels = c("PBS", "S.m"))
 table(S.m_P.rett_no_extremes$primary, S.m_P.rett_no_extremes$secondary_dose)
+
+S.m_bacterial_load$primary <- ordered(S.m_bacterial_load$primary, levels = c("PBS", "S.m"))
+table(S.m_bacterial_load$primary, S.m_bacterial_load$secondary_dose)
 
 #THE GRAPH
 png(file="S.m_P.rett_no_extremes.png",width=1200,height=900,res=130)
@@ -90,6 +110,16 @@ S.m_P.rett_no_extremes$secondary_dose <- as.factor(S.m_P.rett_no_extremes$second
 S.m_P.rett_no_extremes_coxph <- coxph(Surv(day, status) ~ secondary_dose + primary + rep + primary:secondary_dose + rep:secondary_dose + rep:primary, data = S.m_P.rett_no_extremes)
 summary(S.m_P.rett_no_extremes_coxph)
 anova(S.m_P.rett_no_extremes_coxph)
+
+#BACTERIAL LOAD
+png(file="S.m_P.rett_bacterial_load.png",width=1200,height=900,res=130)
+ggplot(S.m_bacterial_load, aes(x = as.character(secondary_dose), y = log10_10hour, fill = primary)) +
+  scale_fill_manual(values=c("gray", "#055df5")) +
+  geom_boxplot() + 
+  theme_classic(base_size = 25) + 
+  xlab("secondary dose of P. rettgeri") +
+  ylab("log(calculated bacterial load)") +
+  geom_point(aes(color = primary), size = 1.1, position=position_jitterdodge())
 ```
 
 ```{r, S.m-P.rett extremes survival data}

@@ -18,7 +18,6 @@ library(agricolae)
 
 rm(list=ls()) #removes all old variables
 E.fae_data = read.csv("E.fae resistance data.csv")
-S.m_data = read.csv("S.m resistance data.csv")
 
 ```
 
