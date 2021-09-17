@@ -69,22 +69,30 @@ legend("topright", #location
        lwd=5, #line width for legend lines
        cex=1) #font size
 
-#STATISTICS
+#SURVIVAL STATISTICS
 #Generate a Cox proportional Hazards model which assesses the contribution of infectious dose while controlling for replicate
 E.fae_P.rett$secondary_dose <- as.factor(E.fae_P.rett$secondary_dose)
 E.fae_P.rett_coxph <- coxph(Surv(day, status) ~ secondary_dose + primary + rep + primary:secondary_dose + rep:secondary_dose + rep:primary, data = E.fae_P.rett)
 summary(E.fae_P.rett_coxph)
 anova(E.fae_P.rett_coxph)
 
+#10HOUR STUFF
 #BACTERIAL LOAD
+E.fae_bacterial_load_10hr <- subset(E.fae_bacterial_load, time == 10)
+table(E.fae_bacterial_load_10hr$time, E.fae_bacterial_load_10hr$secondary_dose)
+
 png(file="E.fae_P.rett_bacterial_load.png",width=1200,height=900,res=130)
-ggplot(E.fae_bacterial_load, aes(x = as.character(secondary_dose), y = log10_10hour, fill = primary)) +
+ggplot(E.fae_bacterial_load_10hr, aes(x = as.character(secondary_dose), y = log(load), fill = primary)) +
   scale_fill_manual(values=c("gray", "#055df5")) +
   geom_boxplot() + 
   theme_classic(base_size = 25) + 
   xlab("secondary dose of P. rettgeri") +
   ylab("log(calculated bacterial load)") +
-  geom_point(aes(color = primary), size = 1.1, position=position_jitterdodge())
+  geom_point(color = "black", size = 1.1, position=position_jitterdodge())
+
+#BACTERIAL LOAD STATISTICS
+E.fae_resistance <- lm(log(load) ~ secondary_dose + primary + replicate + secondary_dose:primary, data = E.fae_bacterial_load_10hr)
+anova(E.fae_resistance)
 ```
 
 ```{r, S.m-P.rett no extremes survival data}
