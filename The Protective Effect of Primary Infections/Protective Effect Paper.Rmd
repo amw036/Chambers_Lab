@@ -92,7 +92,8 @@ ggplot(E.fae_bacterial_load_10hr, aes(x = as.character(secondary_dose), y = log(
 
 #BACTERIAL LOAD STATISTICS
 E.fae_resistance <- lm(log(load) ~ secondary_dose + primary + replicate + secondary_dose:primary, data = E.fae_bacterial_load_10hr)
-anova(E.fae_resistance)
+E.fae_resistance_anova <- anova(E.fae_resistance)
+E.fae_resistance_anova
 ```
 
 ```{r, S.m-P.rett no extremes survival data}
@@ -119,6 +120,7 @@ S.m_P.rett_no_extremes_coxph <- coxph(Surv(day, status) ~ secondary_dose + prima
 summary(S.m_P.rett_no_extremes_coxph)
 anova(S.m_P.rett_no_extremes_coxph)
 
+#DO NOT HAVE DATA IN THE RIGHT FORMAT YET - S.m_bacterial_load is a fake!
 #BACTERIAL LOAD
 png(file="S.m_P.rett_bacterial_load.png",width=1200,height=900,res=130)
 ggplot(S.m_bacterial_load, aes(x = as.character(secondary_dose), y = log10_10hour, fill = primary)) +
@@ -128,6 +130,11 @@ ggplot(S.m_bacterial_load, aes(x = as.character(secondary_dose), y = log10_10hou
   xlab("secondary dose of P. rettgeri") +
   ylab("log(calculated bacterial load)") +
   geom_point(aes(color = primary), size = 1.1, position=position_jitterdodge())
+
+#BACTERIAL LOAD STATISTICS
+S.m_resistance <- lm(log(load) ~ secondary_dose + primary + replicate + secondary_dose:primary, data = S.m_bacterial_load)
+S.m_resistance_anova <- anova(S.m_resistance)
+S.m_resistance_anova
 ```
 
 ```{r, S.m-P.rett extremes survival data}
@@ -174,7 +181,7 @@ anova(S.m_P.snee_coxph)
 ```{r, S.m-P.rett varied primary survival data}
 P.rett_varied_primary = subset(P.rett_varied_primary, secondary == "P.rett")
 table(P.rett_varied_primary$primary_dose)
-P.rett_varied_primary$primary_dose <- factor(P.rett_varied_primary$primary_dose)
+P.rett_varied_primary$primary_dose <- as.factor(P.rett_varied_primary$primary_dose)
 
 png(file="P.rett_varied_primary.png",  width = 1700, height = 1500, res = 300)
 #par(mar=c(4,4,0.1,0.1)) #sets the margins around the graph so there is room for the labels
@@ -187,14 +194,16 @@ legend("bottomleft", bty="n" , c("PBS-P.rett 2.0", "S.m 0.001-P.rett 2.0", "S.m 
 
 #STATISTICS
 #Generate a Cox proportional Hazards model which assesses the contribution of infectious dose while controlling for replicate
-P.rett_varied_primary_coxph <- coxph(Surv(day, status) ~ primary_dose + rep + rep*primary_dose, data = P.rett_varied_primary)
+table(P.rett_varied_primary$rep, P.rett_varied_primary$primary_dose)
+P.rett_varied_primary_coxph <- coxph(Surv(day, status) ~ primary_dose, data = P.rett_varied_primary)
 summary(P.rett_varied_primary_coxph)
 anova(P.rett_varied_primary_coxph)
 ```
 
 ```{r, S.m-P.snee varied primary survival data}
-P.snee_varied_primary = subset(P.snee_varied_primary, secondary == "P.snee")
-table(P.snee_varied_primary$condition)
+P.snee_varied_primary <- subset(P.snee_varied_primary, secondary == "P.snee")
+droplevels(P.snee_varied_primary)
+table(P.snee_varied_primary$rep, P.snee_varied_primary$primary_dose)
 
 png(file="P.snee_varied_primary.png",  width = 1700, height = 1500, res = 300)
 #par(mar=c(4,4,0.1,0.1)) #sets the margins around the graph so there is room for the labels
@@ -204,4 +213,13 @@ axis(1, cex.axis=1, lwd=4.5)
 box(lwd=4.5)
 
 legend("bottomleft", bty="n" , c("PBS-P.snee 2.0", "S.m 0.001-P.snee 2.0", "S.m 0.01-P.snee 2.0", "S.m 0.1-P.snee 2.0", "S.m 1.0-P.snee 2.0", "S.m 2.0-P.snee 2.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"),lty=c(1, 1, 1, 1, 1, 1),lwd=5, cex=1)
+
+#STATISTICS
+#Generate a Cox proportional Hazards model which assesses the contribution of primary dose while controlling for replicate
+table(P.snee_varied_primary$primary, P.snee_varied_primary$primary_dose)
+P.snee_varied_primary$primary <- as.factor(P.snee_varied_primary$primary)
+P.snee_varied_primary$primary_dose <- as.factor(P.snee_varied_primary$primary_dose)
+P.snee_varied_primary_coxph <- coxph(Surv(hour, status) ~ primary_dose, data = P.snee_varied_primary)
+summary(P.snee_varied_primary_coxph)
+anova(P.snee_varied_primary_coxph)
 ```
