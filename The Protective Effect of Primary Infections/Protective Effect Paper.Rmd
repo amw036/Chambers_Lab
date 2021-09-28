@@ -40,7 +40,7 @@ png(file="E.fae-P.rett.png", width=1200, heigh=900, res=130) #determines where t
 par(mar=c(4,5,1,1)) #sets the margins around the graph so there is room for the labels
 #The graph
 plot(survfit(Surv(E.fae_P.rett$day, E.fae_P.rett$status) ~ E.fae_P.rett$primary + E.fae_P.rett$secondary_dose), 
-     col=c("#B5E8FC", "#09B6FC", "#055df5", "#0600a8"), #line color
+     col=c("#B5E8FC", "#09B6FC", "#055df5", "#0600a8"), #line color, cycles through
      lty=c(3, 3, 3, 3, 1, 1, 1, 1), #line type
      lwd=5, #line width
      yaxt='n', #hide the y axis so I can customize it
