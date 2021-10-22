@@ -25,6 +25,13 @@ S.m_P.rett_extremes = read.csv("S.m-P.rett extremes.csv")
 S.m_P.snee = read.csv("S.m-P.snee.csv")
 P.rett_varied_primary = read.csv("Varied primary S.m-P.rett.csv")
 P.snee_varied_primary = read.csv("Varied primary S.m-P.snee.csv")
+
+table(S.m_P.rett_no_extremes$date, S.m_P.rett_no_extremes$secondary_dose)
+#S.m_P.rett_no_extremes 7/10/18 is the problematic one - need to delete
+#S.m_P.rett_no8 <- subset(S.m_P.rett_no_extremes, date == "6/14/2019" | date == "6/17/2019" | date == "6/19/2019" | date == "6/25/2019" | date == "6/27/2019" | date == "6/28/2019" | date == "8/2/2018" | date == "8/6/2018")
+#table(S.m_P.rett_no8$date, S.m_P.rett_no8$secondary_dose)
+
+#write.csv(S.m_P.rett_no8, "S.m_P.rett no extremes.csv")
 ```
 
 ```{r, E.fae-P.rett survival data}
