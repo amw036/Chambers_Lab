@@ -1,0 +1,99 @@
+---
+title: "Chronic infections reduce mortality following unrelated secondary infections in Drosophila melanogaster"
+author: "Abigail Wukitch"
+date: "11/10/2021"
+editor_options:
+  chunk_output_type: console
+output:
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 4
+    theme: cerulean
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Results
+
+```{r, load libraries and data}
+library(survival)
+library(RColorBrewer)
+library(ggplot2)
+library(rlang)
+library(agricolae)
+
+rm(list=ls()) #removes all old variables
+E.fae_P.rett = read.csv("E.fae-P.rett.csv")
+E.fae_bacterial_load = read.csv("E.fae bacterial load data.csv")
+S.m_P.rett_no_extremes = read.csv("S.m-P.rett no extremes.csv")
+S.m_bacterial_load = read.csv("S.m bacterial load data.csv")
+S.m_P.rett_extremes = read.csv("S.m-P.rett extremes.csv")
+S.m_P.snee = read.csv("S.m-P.snee.csv")
+P.rett_varied_primary = read.csv("Varied primary S.m-P.rett.csv")
+P.snee_varied_primary = read.csv("Varied primary S.m-P.snee.csv")
+```
+Flies were each infected twice through injection (see Methods: Double Injection). Chronic infections were established via abdomen injection while secondary infections were induced through thorax injection. Chronic infections with both E. faecalis and S. marcescens provided protection against mortality following secondary infection with P. rettgeri (Figure 1, Table 1, chronic infection: p < 0.0001). The date and dose of the secondary infection significantly impacted survival across all conditions (date: p < 0.0001, secondary dose: p < 0.0001). However, flies chronically infected with S. marcescens did not have a strong dose-dependent response to secondary infection relative to controls (secondary dose x chronic infection: p < 0.0001) ranging between approximately 30 to 50% mortality, while controls conditions ranged from approximately 60 to 100% mortality. For flies chronically infected with S. marcescens, the date of secondary infection influenced the impact of different doses of P. rettgeri (rep x secondary dose: p < 0.01) with some dates showing larger or smaller ranges of mortality. The date of secondary infection also affected the strength of protection given by S. marcescens chronic infection (block x chronic infection: p < 0.0001).
+
+## Figure 1: Chronic infections with E. faecalis or S. marcescens provided protection against mortality following secondary infection with P. rettgeri {.tabset} 
+
+### Figure 1A
+#### E. faecalis - P. rettgeri
+Mortality following secondary infection with P. rettgeri in flies chronically infected with S. marcescens versus control flies not given a chronic infection. Flies chronically infected with S. marcescens were more likely to survive various doses of secondary infection with P. rettgeri (p < 0.0001). 
+```{r, Figure 1A}
+E.fae_P.rett$primary <- ordered(E.fae_P.rett$primary, levels = c("PBS", "E.fae"))
+#KAPLAN MEIER
+#png(file="E.fae-P.rett.png", width=1200, heigh=900, res=130) #determines where the graph will be saved
+par(mar=c(4,5,1,1)) #sets the margins around the graph so there is room for the labels
+#The graph
+plot(survfit(Surv(E.fae_P.rett$day, E.fae_P.rett$status) ~ E.fae_P.rett$primary + E.fae_P.rett$secondary_dose), 
+     col=c("#B5E8FC", "#09B6FC", "#055df5", "#0600a8"), #line color, cycles through
+     lty=c(3, 3, 3, 3, 1, 1, 1, 1), #line type
+     lwd=5, #line width
+     yaxt='n', #hide the y axis so I can customize it
+     xaxt='n', #hide the x axis so I can customize itS
+     ylab="proportion alive", #label for the y-axis
+     xlab="days post-secondary infection", #label for the x-axis
+     cex.lab=2.5, #font size of axis labels
+     xlim=c(0,7), #determines range of the x-axis
+     xaxs='i') #makes the data flush with the axis 
+#Y axis
+axis(2, #left side
+     las=2, #perpendicular to the axis
+     cex.axis=1.5, #font size
+     lwd=5) #line width
+#X axis
+axis(1, #bottom of the graph
+     cex.axis=1.5, #font size
+     lwd=5) #line width
+box(lwd=5)
+#The legend
+legend("topright", #location
+       bty="n", #no box around the legend
+       c("PBS-P.rett 0.001", "PBS-P.rett 0.01", "PBS-P.rett 0.1", 'PBS-P.rett 1.0', "E.fae-P.rett 0.001", "E.fae-P.rett 0.01", "E.fae-P.rett 0.1", "E.fae-P.rett 1.0"), #labels in the legend
+       col=c("#B5E8FC", "#09B6FC", "#055df5", "#0600a8"), #colors for the legend lines, cycles through
+       lty=c(3, 3, 3, 3, 1, 1, 1, 1), #line type for legend lines
+       lwd=5, #line width for legend lines
+       cex=1) #font size
+```
+
+### Figure 1B
+#### S. marcescens - P. rettgeri
+Mortality following secondary infection with P. rettgeri in flies chronically infected with S. marcescens versus control flies not given a chronic infection. Flies chronically infected with E. faecalis were more likely to survive various doses of secondary infection with P. rettgeri (p < 0.0001) 
+
+```{r, Figure 1B}
+S.m_P.rett_no_extremes$primary <- ordered(S.m_P.rett_no_extremes$primary, levels = c("PBS", "S.m"))
+
+#THE GRAPH
+#png(file="S.m_P.rett_no_extremes.png",width=1200,height=900,res=130)
+par(mar=c(4,5,1,1)) #sets the margins around the graph so there is room for the labels
+plot(survfit(Surv(S.m_P.rett_no_extremes$day, S.m_P.rett_no_extremes$status) ~ S.m_P.rett_no_extremes$primary + S.m_P.rett_no_extremes$secondary_dose), col=c("#B5E8FC",  "#09B6FC", "#055df5", "#003694"), lty=c(3, 3, 3, 3, 1, 1, 1, 1), lwd=5,yaxt='n', xaxt='n', ylab="proportion alive", xlab="days post-secondary infection", cex.lab=2.5, xlim=c(0,7), xaxs='i') 
+axis(2, las=2, cex.axis=1.5, lwd=5)
+axis(1, cex.axis=1.5, lwd=5)
+box(lwd=5)
+
+#THE LEGEND
+legend("topright",inset=0, bty="n" , c("PBS-P.rett 0.01", "PBS-P.rett 0.1", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "S.m-P.rett 0.01", "S.m-P.rett 0.1", "S.m-P.rett 1.0", "S.m-P.rett 2.0"),col=c("#B5E8FC", "#09B6FC", "#055df5", "#003694"),lty=c(3, 3, 3, 3, 1, 1, 1, 1),lwd=5, cex=1)
+```

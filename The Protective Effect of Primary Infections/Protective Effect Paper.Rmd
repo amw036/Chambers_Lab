@@ -1,14 +1,25 @@
 ---
 title: "Protective Effect Paper"
 author: "Abigail Wukitch"
-date: "7/15/2021"
-output: html_document
+date: "11/10/2021"
+editor_options:
+  chunk_output_type: console
+output:
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 4
+    theme: cerulean
+    code_folding: hide
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+#Chronic infections reduce mortality following unrelated secondary infections in Drosophila melanogaster
 
+##Step 1: Ready the workspace
+Load all necessary libraries, packages, and data files
 ```{r, load libraries and data}
 library(survival)
 library(RColorBrewer)
@@ -33,7 +44,12 @@ table(S.m_P.rett_no_extremes$date, S.m_P.rett_no_extremes$secondary_dose)
 
 #write.csv(S.m_P.rett_no8, "S.m_P.rett no extremes.csv")
 ```
+##Figure 1: Chronic infections with E. faeclis or S. marcescens provided protection against mortality following secondary infection with P. rettgeri {.tabset}
+(B) Mortality following secondary infection with P. rettgeri in flies chronically infected with S. marcescens versus control flies not given a chronic infection. Flies chronically infected with E. faecalis were more likely to survive various doses of secondary infection with P. rettgeri (p < 0.0001).
 
+###Figure 1A
+
+####Mortality following secondary infection with P. rettgeri in flies chronically infected with S. marcescens versus control flies not given a chronic infection. Flies chronically infected with S. marcescens were more likely to survive various doses of secondary infection with P. rettgeri (p < 0.0001). 
 ```{r, E.fae-P.rett survival data}
 E.fae_P.rett$primary <- ordered(E.fae_P.rett$primary, levels = c("PBS", "E.fae"))
 table(E.fae_P.rett$primary, E.fae_P.rett$secondary_dose)
@@ -75,6 +91,9 @@ legend("topright", #location
        lty=c(3, 3, 3, 3, 1, 1, 1, 1), #line type for legend lines
        lwd=5, #line width for legend lines
        cex=1) #font size
+```
+
+```{r}
 
 #SURVIVAL STATISTICS
 #Generate a Cox proportional Hazards model which assesses the contribution of infectious dose while controlling for replicate
@@ -129,19 +148,19 @@ anova(S.m_P.rett_no_extremes_coxph)
 
 #DO NOT HAVE DATA IN THE RIGHT FORMAT YET - S.m_bacterial_load is a fake!
 #BACTERIAL LOAD
-png(file="S.m_P.rett_bacterial_load.png",width=1200,height=900,res=130)
-ggplot(S.m_bacterial_load, aes(x = as.character(secondary_dose), y = log10_10hour, fill = primary)) +
-  scale_fill_manual(values=c("gray", "#055df5")) +
-  geom_boxplot() + 
-  theme_classic(base_size = 25) + 
-  xlab("secondary dose of P. rettgeri") +
-  ylab("log(calculated bacterial load)") +
-  geom_point(aes(color = primary), size = 1.1, position=position_jitterdodge())
+#png(file="S.m_P.rett_bacterial_load.png",width=1200,height=900,res=130)
+#ggplot(S.m_bacterial_load, aes(x = as.character(secondary_dose), y = log10_10hour, fill = primary)) +
+#  scale_fill_manual(values=c("gray", "#055df5")) +
+#  geom_boxplot() + 
+#  theme_classic(base_size = 25) + 
+#  xlab("secondary dose of P. rettgeri") +
+#  ylab("log(calculated bacterial load)") +
+#  geom_point(aes(color = primary), size = 1.1, position=position_jitterdodge())
 
 #BACTERIAL LOAD STATISTICS
-S.m_resistance <- lm(log(load) ~ secondary_dose + primary + replicate + secondary_dose:primary, data = S.m_bacterial_load)
-S.m_resistance_anova <- anova(S.m_resistance)
-S.m_resistance_anova
+#S.m_resistance <- lm(log(load) ~ secondary_dose + primary + replicate + secondary_dose:primary, data = S.m_bacterial_load)
+#S.m_resistance_anova <- anova(S.m_resistance)
+#S.m_resistance_anova
 ```
 
 ```{r, S.m-P.rett extremes survival data}
