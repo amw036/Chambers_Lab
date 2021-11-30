@@ -605,6 +605,7 @@ box(lwd=4.5)
 
 legend("bottomleft", bty="n" , c("PBS-P.rett 2.0", "S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0-P.rett 2.0", "S.m 2.0-P.rett 2.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"),lty=c(1, 1, 1, 1, 1, 1),lwd=5, cex=1)
 
+
 #STATISTICS
 #Generate a Cox proportional Hazards model which assesses the contribution of infectious dose while controlling for replicate
 P.rett_varied_primary_coxph <- coxph(Surv(day, status) ~ primary_dose, data = P.rett_varied_primary)
@@ -755,7 +756,7 @@ legend("bottomleft", bty="n" , c("PBS-P.rett 2.0", "S.m 0.001-P.rett 2.0", "S.m 
 ## Figure 4B {.tabset}
 words
 
-### S.marcescens - P.sneebia
+### Graph
 ```{r, S.m-P.snee varied primary survival data}
 P.snee_varied_primary <- subset(P.snee_varied_primary, secondary == "P.snee")
 table(P.snee_varied_primary$date, P.snee_varied_primary$primary_dose)
