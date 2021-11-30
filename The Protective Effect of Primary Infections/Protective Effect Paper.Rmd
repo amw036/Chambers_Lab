@@ -36,19 +36,165 @@ S.m_P.snee = read.csv("S.m-P.snee.csv")
 P.rett_varied_primary = read.csv("Varied primary S.m-P.rett.csv")
 P.snee_varied_primary = read.csv("Varied primary S.m-P.snee.csv")
 
-table(S.m_P.rett_no_extremes$date, S.m_P.rett_no_extremes$secondary_dose)
 #S.m_P.rett_no_extremes 7/10/18 is the problematic one - need to delete
 #S.m_P.rett_no8 <- subset(S.m_P.rett_no_extremes, date == "6/14/2019" | date == "6/17/2019" | date == "6/19/2019" | date == "6/25/2019" | date == "6/27/2019" | date == "6/28/2019" | date == "8/2/2018" | date == "8/6/2018")
 #table(S.m_P.rett_no8$date, S.m_P.rett_no8$secondary_dose)
 
 #write.csv(S.m_P.rett_no8, "S.m_P.rett no extremes.csv")
 ```
+## Figure 1A {.tabset}
+Chronic infections with S. marcescens provided protection against mortality following secondary infection with P. rettgeri
+
+### Graph
+Mortality following secondary infection with P. rettgeri in flies chronically infected with S. marcescens versus control flies not given a chronic infection. Flies chronically infected with S. marcescens were more likely to survive various doses of secondary infection with P. rettgeri (p < 0.0001).
+
+```{r, S.m-P.rett no extremes survival data}
+S.m_P.rett_no_extremes$primary <- ordered(S.m_P.rett_no_extremes$primary, levels = c("PBS", "S.m"))
+#table(S.m_P.rett_no_extremes$primary, S.m_P.rett_no_extremes$secondary_dose)
+
+S.m_bacterial_load$primary <- ordered(S.m_bacterial_load$primary, levels = c("PBS", "S.m"))
+#table(S.m_bacterial_load$primary, S.m_bacterial_load$secondary_dose)
+
+#THE GRAPH
+#png(file="S.m_P.rett_no_extremes.png",width=1200,height=900,res=130)
+par(mar=c(4,5,1,1)) #sets the margins around the graph so there is room for the labels
+plot(survfit(Surv(S.m_P.rett_no_extremes$day, S.m_P.rett_no_extremes$status) ~ S.m_P.rett_no_extremes$primary + S.m_P.rett_no_extremes$secondary_dose), col=c("#B5E8FC",  "#09B6FC", "#055df5", "#003694"), lty=c(3, 3, 3, 3, 1, 1, 1, 1), lwd=5,yaxt='n', xaxt='n', ylab="proportion alive", xlab="days post-secondary infection", cex.lab=2.5, xlim=c(0,7), xaxs='i') 
+axis(2, las=2, cex.axis=1.5, lwd=5)
+axis(1, cex.axis=1.5, lwd=5)
+box(lwd=5)
+
+#THE LEGEND
+legend("topright",inset=0, bty="n" , c("PBS-P.rett 0.01", "PBS-P.rett 0.1", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "S.m-P.rett 0.01", "S.m-P.rett 0.1", "S.m-P.rett 1.0", "S.m-P.rett 2.0"),col=c("#B5E8FC", "#09B6FC", "#055df5", "#003694"),lty=c(3, 3, 3, 3, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Statistics
+```{r}
+#STATISTICS
+S.m_P.rett_no_extremes$secondary_dose <- as.factor(S.m_P.rett_no_extremes$secondary_dose)
+S.m_P.rett_no_extremes_coxph <- coxph(Surv(day, status) ~ secondary_dose + primary + rep + primary:secondary_dose + rep:secondary_dose + rep:primary, data = S.m_P.rett_no_extremes)
+#summary(S.m_P.rett_no_extremes_coxph)
+anova(S.m_P.rett_no_extremes_coxph)
+```
+
+### Block 1
+```{r}
+S.m_P.rett_no_extremes_block1 <- subset(S.m_P.rett_no_extremes, date == "8/2/2018")
+table(S.m_P.rett_no_extremes_block1$primary, S.m_P.rett_no_extremes_block1$secondary_dose)
+
+#THE GRAPH
+par(mar=c(4,5,1,1))
+plot(survfit(Surv(S.m_P.rett_no_extremes_block1$day, S.m_P.rett_no_extremes_block1$status) ~ S.m_P.rett_no_extremes_block1$primary + S.m_P.rett_no_extremes_block1$secondary_dose), col=c("#B5E8FC",  "#09B6FC", "#055df5"), lty=c(3, 3, 3, 1, 1, 1), lwd=5,yaxt='n', xaxt='n', ylab="proportion alive", xlab="days post-secondary infection", cex.lab=2.5, xlim=c(0,7), xaxs='i') 
+axis(2, las=2, cex.axis=1.5, lwd=5)
+axis(1, cex.axis=1.5, lwd=5)
+box(lwd=5)
+
+#THE LEGEND
+legend("topright",inset=0, bty="n" , c("PBS-P.rett 0.01", "PBS-P.rett 0.1", "PBS-P.rett 1.0", "S.m-P.rett 0.01", "S.m-P.rett 0.1", "S.m-P.rett 1.0"),col=c("#B5E8FC", "#09B6FC", "#055df5"),lty=c(3, 3, 3, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Block 2
+```{r}
+S.m_P.rett_no_extremes_block2 <- subset(S.m_P.rett_no_extremes, date == "8/6/2018")
+table(S.m_P.rett_no_extremes_block2$primary, S.m_P.rett_no_extremes_block2$secondary_dose)
+
+#THE GRAPH
+par(mar=c(4,5,1,1))
+plot(survfit(Surv(S.m_P.rett_no_extremes_block2$day, S.m_P.rett_no_extremes_block2$status) ~ S.m_P.rett_no_extremes_block2$primary + S.m_P.rett_no_extremes_block2$secondary_dose), col=c("#B5E8FC",  "#09B6FC", "#055df5"), lty=c(3, 3, 3, 1, 1, 1), lwd=5,yaxt='n', xaxt='n', ylab="proportion alive", xlab="days post-secondary infection", cex.lab=2.5, xlim=c(0,7), xaxs='i') 
+axis(2, las=2, cex.axis=1.5, lwd=5)
+axis(1, cex.axis=1.5, lwd=5)
+box(lwd=5)
+
+#THE LEGEND
+legend("topright",inset=0, bty="n" , c("PBS-P.rett 0.01", "PBS-P.rett 0.1", "PBS-P.rett 1.0", "S.m-P.rett 0.01", "S.m-P.rett 0.1", "S.m-P.rett 1.0"),col=c("#B5E8FC", "#09B6FC", "#055df5"),lty=c(3, 3, 3, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Block 3
+```{r}
+S.m_P.rett_no_extremes_block3 <- subset(S.m_P.rett_no_extremes, date == "6/14/2019")
+table(S.m_P.rett_no_extremes_block3$primary, S.m_P.rett_no_extremes_block3$secondary_dose)
+
+#THE GRAPH
+par(mar=c(4,5,1,1))
+plot(survfit(Surv(S.m_P.rett_no_extremes_block3$day, S.m_P.rett_no_extremes_block3$status) ~ S.m_P.rett_no_extremes_block3$primary + S.m_P.rett_no_extremes_block3$secondary_dose), col=c("#B5E8FC",  "#09B6FC", "#055df5", "#003694"), lty=c(3, 3, 3, 3, 1, 1, 1, 1), lwd=5,yaxt='n', xaxt='n', ylab="proportion alive", xlab="days post-secondary infection", cex.lab=2.5, xlim=c(0,7), xaxs='i') 
+axis(2, las=2, cex.axis=1.5, lwd=5)
+axis(1, cex.axis=1.5, lwd=5)
+box(lwd=5)
+
+#THE LEGEND
+legend("topright",inset=0, bty="n" , c("PBS-P.rett 0.01", "PBS-P.rett 0.1", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "S.m-P.rett 0.01", "S.m-P.rett 0.1", "S.m-P.rett 1.0", "S.m-P.rett 2.0"),col=c("#B5E8FC", "#09B6FC", "#055df5", "#003694"),lty=c(3, 3, 3, 3, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+
+### Block 4
+```{r}
+S.m_P.rett_no_extremes_block4 <- subset(S.m_P.rett_no_extremes, date == "6/17/2019")
+table(S.m_P.rett_no_extremes_block4$primary, S.m_P.rett_no_extremes_block4$secondary_dose)
+
+#THE GRAPH
+par(mar=c(4,5,1,1))
+plot(survfit(Surv(S.m_P.rett_no_extremes_block4$day, S.m_P.rett_no_extremes_block4$status) ~ S.m_P.rett_no_extremes_block4$primary + S.m_P.rett_no_extremes_block4$secondary_dose), col=c("#B5E8FC",  "#09B6FC", "#055df5", "#003694"), lty=c(3, 3, 3, 3, 1, 1, 1, 1), lwd=5,yaxt='n', xaxt='n', ylab="proportion alive", xlab="days post-secondary infection", cex.lab=2.5, xlim=c(0,7), xaxs='i') 
+axis(2, las=2, cex.axis=1.5, lwd=5)
+axis(1, cex.axis=1.5, lwd=5)
+box(lwd=5)
+
+#THE LEGEND
+legend("topright",inset=0, bty="n" , c("PBS-P.rett 0.01", "PBS-P.rett 0.1", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "S.m-P.rett 0.01", "S.m-P.rett 0.1", "S.m-P.rett 1.0", "S.m-P.rett 2.0"),col=c("#B5E8FC", "#09B6FC", "#055df5", "#003694"),lty=c(3, 3, 3, 3, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Block 5
+```{r}
+S.m_P.rett_no_extremes_block5 <- subset(S.m_P.rett_no_extremes, date == "6/19/2019")
+table(S.m_P.rett_no_extremes_block5$primary, S.m_P.rett_no_extremes_block5$secondary_dose)
+
+#THE GRAPH
+par(mar=c(4,5,1,1))
+plot(survfit(Surv(S.m_P.rett_no_extremes_block5$day, S.m_P.rett_no_extremes_block5$status) ~ S.m_P.rett_no_extremes_block5$primary + S.m_P.rett_no_extremes_block5$secondary_dose), col=c("#B5E8FC",  "#09B6FC", "#055df5", "#003694"), lty=c(3, 3, 3, 3, 1, 1, 1, 1), lwd=5,yaxt='n', xaxt='n', ylab="proportion alive", xlab="days post-secondary infection", cex.lab=2.5, xlim=c(0,7), xaxs='i') 
+axis(2, las=2, cex.axis=1.5, lwd=5)
+axis(1, cex.axis=1.5, lwd=5)
+box(lwd=5)
+
+#THE LEGEND
+legend("topright",inset=0, bty="n" , c("PBS-P.rett 0.01", "PBS-P.rett 0.1", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "S.m-P.rett 0.01", "S.m-P.rett 0.1", "S.m-P.rett 1.0", "S.m-P.rett 2.0"),col=c("#B5E8FC", "#09B6FC", "#055df5", "#003694"),lty=c(3, 3, 3, 3, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Block 6
+```{r}
+S.m_P.rett_no_extremes_block6 <- subset(S.m_P.rett_no_extremes, date == "6/25/2019")
+table(S.m_P.rett_no_extremes_block6$primary, S.m_P.rett_no_extremes_block6$secondary_dose)
+
+#THE GRAPH
+par(mar=c(4,5,1,1))
+plot(survfit(Surv(S.m_P.rett_no_extremes_block6$day, S.m_P.rett_no_extremes_block6$status) ~ S.m_P.rett_no_extremes_block6$primary + S.m_P.rett_no_extremes_block6$secondary_dose), col=c("#B5E8FC",  "#09B6FC", "#055df5", "#003694"), lty=c(3, 3, 3, 3, 1, 1, 1, 1), lwd=5,yaxt='n', xaxt='n', ylab="proportion alive", xlab="days post-secondary infection", cex.lab=2.5, xlim=c(0,7), xaxs='i') 
+axis(2, las=2, cex.axis=1.5, lwd=5)
+axis(1, cex.axis=1.5, lwd=5)
+box(lwd=5)
+
+#THE LEGEND
+legend("topright",inset=0, bty="n" , c("PBS-P.rett 0.01", "PBS-P.rett 0.1", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "S.m-P.rett 0.01", "S.m-P.rett 0.1", "S.m-P.rett 1.0", "S.m-P.rett 2.0"),col=c("#B5E8FC", "#09B6FC", "#055df5", "#003694"),lty=c(3, 3, 3, 3, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Block 7
+```{r}
+S.m_P.rett_no_extremes_block7 <- subset(S.m_P.rett_no_extremes, date == "6/27/2019")
+table(S.m_P.rett_no_extremes_block7$primary, S.m_P.rett_no_extremes_block7$secondary_dose)
+
+#THE GRAPH
+par(mar=c(4,5,1,1))
+plot(survfit(Surv(S.m_P.rett_no_extremes_block7$day, S.m_P.rett_no_extremes_block7$status) ~ S.m_P.rett_no_extremes_block7$primary + S.m_P.rett_no_extremes_block7$secondary_dose), col=c("#B5E8FC",  "#09B6FC", "#055df5", "#003694"), lty=c(3, 3, 3, 3, 1, 1, 1, 1), lwd=5,yaxt='n', xaxt='n', ylab="proportion alive", xlab="days post-secondary infection", cex.lab=2.5, xlim=c(0,7), xaxs='i') 
+axis(2, las=2, cex.axis=1.5, lwd=5)
+axis(1, cex.axis=1.5, lwd=5)
+box(lwd=5)
+
+#THE LEGEND
+legend("topright",inset=0, bty="n" , c("PBS-P.rett 0.01", "PBS-P.rett 0.1", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "S.m-P.rett 0.01", "S.m-P.rett 0.1", "S.m-P.rett 1.0", "S.m-P.rett 2.0"),col=c("#B5E8FC", "#09B6FC", "#055df5", "#003694"),lty=c(3, 3, 3, 3, 1, 1, 1, 1),lwd=5, cex=1)
+```
 
 ## Figure 1B {.tabset}
 Chronic infections with E. faecalis provided protection against mortality following secondary infection with P. rettgeri 
 
 ### Graph
-Mortality following secondary infection with P. rettgeri in flies chronically infected with S. marcescens versus control flies not given a chronic infection. Flies chronically infected with S. marcescens were more likely to survive various doses of secondary infection with P. rettgeri (p < 0.0001). 
+Mortality following secondary infection with P. rettgeri in flies chronically infected with S. marcescens versus control flies not given a chronic infection. Flies chronically infected with S. marcescens were more likely to survive various doses of secondary infection with P. rettgeri (p < 0.0001).
+
 ```{r, E.fae-P.rett survival data}
 E.fae_P.rett$primary <- ordered(E.fae_P.rett$primary, levels = c("PBS", "E.fae"))
 
@@ -90,14 +236,14 @@ legend("topright", #location
        cex=1) #font size
 ```
 
-### Figure 1B Statistics
+### Statistics
 ```{r}
 #SURVIVAL STATISTICS
 #Generate a Cox proportional Hazards model which assesses the contribution of infectious dose while controlling for replicate
 E.fae_P.rett$secondary_dose <- as.factor(E.fae_P.rett$secondary_dose)
 E.fae_P.rett_coxph <- coxph(Surv(day, status) ~ secondary_dose + primary + rep + primary:secondary_dose + rep:secondary_dose + rep:primary, data = E.fae_P.rett)
-summary(E.fae_P.rett_coxph)
-#anova(E.fae_P.rett_coxph)
+#summary(E.fae_P.rett_coxph)
+anova(E.fae_P.rett_coxph)
 
 table(E.fae_P.rett$rep, E.fae_P.rett$secondary_dose)
 
@@ -178,6 +324,7 @@ plot(survfit(Surv(E.fae_P.rett_block7$day, E.fae_P.rett_block7$status) ~ E.fae_P
 axis(2, las=2, cex.axis=1.5, lwd=5)
 axis(1, cex.axis=1.5, lwd=5)
 box(lwd=5)
+
 legend("topright",inset=0, bty="n" , c("PBS-P.rett 0.001", "PBS-P.rett 0.01", "PBS-P.rett 0.1", 'PBS-P.rett 1.0', "E.fae-P.rett 0.001", "E.fae-P.rett 0.01", "E.fae-P.rett 0.1", "E.fae-P.rett 1.0"),col=c("#B5E8FC", "#09B6FC", "#055df5", "#003694"),lty=c(3, 3, 3, 3, 1, 1, 1, 1),lwd=5, cex=1)
 ```
 
@@ -198,16 +345,35 @@ legend("topright",inset=0, bty="n" , c("PBS-P.rett 0.001", "PBS-P.rett 0.01", "P
 
 
 ## Figure 2A {.tabset}
-things
+
+### Graph
+The calculated bacterial load after secondary infection with P. rettgeri for flies chronically infected with S. marcescens (n = 505) versus control flies (n = 506). Chronic infection with S. marcescens resulted in lowered calculated bacterial load post secondary infection. 
+```{r}
+#png(file="S.m_P.rett_bacterial_load.png", width=1200, height=900, res=130)
+ggplot(S.m_bacterial_load, aes(x = as.character(secondary_dose), y = log(load_10hr), fill = primary)) +
+  scale_fill_manual(values=c("gray", "#09b6fc")) +
+  geom_boxplot() + 
+  theme_classic(base_size = 25) + 
+  xlab("secondary dose of P. rettgeri") +
+  ylab("log(calculated bacterial load)") +
+  geom_point(color = "black", size = 1.1, position=position_jitterdodge())
+#dev.off()
+```
+
+### Statistics
+```{r}
+#BACTERIAL LOAD STATISTICS
+S.m_resistance <- lm(log(load_10hr) ~ secondary_dose + primary + rep + secondary_dose:primary, data = S.m_bacterial_load)
+S.m_resistance_anova <- anova(S.m_resistance)
+S.m_resistance_anova
+```
 
 ## Figure 2B {.tabset}
 
 ### Graph
 ```{r}
-#10HOUR STUFF
 #BACTERIAL LOAD
 E.fae_bacterial_load_10hr <- subset(E.fae_bacterial_load, time == 10)
-#table(E.fae_bacterial_load_10hr$time, E.fae_bacterial_load_10hr$secondary_dose)
 
 #png(file="E.fae_P.rett_bacterial_load.png",width=1200,height=900,res=130)
 ggplot(E.fae_bacterial_load_10hr, aes(x = as.character(secondary_dose), y = log(load), fill = primary)) +
@@ -217,6 +383,7 @@ ggplot(E.fae_bacterial_load_10hr, aes(x = as.character(secondary_dose), y = log(
   xlab("secondary dose of P. rettgeri") +
   ylab("log(calculated bacterial load)") +
   geom_point(color = "black", size = 1.1, position=position_jitterdodge())
+#dev.off()
 ```
 
 ### Statistics
@@ -224,62 +391,21 @@ ggplot(E.fae_bacterial_load_10hr, aes(x = as.character(secondary_dose), y = log(
 #BACTERIAL LOAD STATISTICS
 E.fae_resistance <- lm(log(load) ~ secondary_dose + primary + replicate + secondary_dose:primary, data = E.fae_bacterial_load_10hr)
 E.fae_resistance_anova <- anova(E.fae_resistance)
-summary(E.fae_resistance_anova)
+E.fae_resistance_anova
 ```
 
-## S.marcescens - P.rettgeri
-```{r, S.m-P.rett no extremes survival data}
-S.m_P.rett_no_extremes$primary <- ordered(S.m_P.rett_no_extremes$primary, levels = c("PBS", "S.m"))
-#table(S.m_P.rett_no_extremes$primary, S.m_P.rett_no_extremes$secondary_dose)
-
-S.m_bacterial_load$primary <- ordered(S.m_bacterial_load$primary, levels = c("PBS", "S.m"))
-#table(S.m_bacterial_load$primary, S.m_bacterial_load$secondary_dose)
-
-#THE GRAPH
-#png(file="S.m_P.rett_no_extremes.png",width=1200,height=900,res=130)
-par(mar=c(4,5,1,1)) #sets the margins around the graph so there is room for the labels
-plot(survfit(Surv(S.m_P.rett_no_extremes$day, S.m_P.rett_no_extremes$status) ~ S.m_P.rett_no_extremes$primary + S.m_P.rett_no_extremes$secondary_dose), col=c("#B5E8FC",  "#09B6FC", "#055df5", "#003694"), lty=c(3, 3, 3, 3, 1, 1, 1, 1), lwd=5,yaxt='n', xaxt='n', ylab="proportion alive", xlab="days post-secondary infection", cex.lab=2.5, xlim=c(0,7), xaxs='i') 
-axis(2, las=2, cex.axis=1.5, lwd=5)
-axis(1, cex.axis=1.5, lwd=5)
-box(lwd=5)
-
-#THE LEGEND
-legend("topright",inset=0, bty="n" , c("PBS-P.rett 0.01", "PBS-P.rett 0.1", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "S.m-P.rett 0.01", "S.m-P.rett 0.1", "S.m-P.rett 1.0", "S.m-P.rett 2.0"),col=c("#B5E8FC", "#09B6FC", "#055df5", "#003694"),lty=c(3, 3, 3, 3, 1, 1, 1, 1),lwd=5, cex=1)
-
-#STATISTICS
-S.m_P.rett_no_extremes$secondary_dose <- as.factor(S.m_P.rett_no_extremes$secondary_dose)
-S.m_P.rett_no_extremes_coxph <- coxph(Surv(day, status) ~ secondary_dose + primary + rep + primary:secondary_dose + rep:secondary_dose + rep:primary, data = S.m_P.rett_no_extremes)
-summary(S.m_P.rett_no_extremes_coxph)
-#anova(S.m_P.rett_no_extremes_coxph)
-
-#DO NOT HAVE DATA IN THE RIGHT FORMAT YET - S.m_bacterial_load is a fake!
-#BACTERIAL LOAD
-#png(file="S.m_P.rett_bacterial_load.png",width=1200,height=900,res=130)
-#ggplot(S.m_bacterial_load, aes(x = as.character(secondary_dose), y = log10_10hour, fill = primary)) +
-#  scale_fill_manual(values=c("gray", "#055df5")) +
-#  geom_boxplot() + 
-#  theme_classic(base_size = 25) + 
-#  xlab("secondary dose of P. rettgeri") +
-#  ylab("log(calculated bacterial load)") +
-#  geom_point(aes(color = primary), size = 1.1, position=position_jitterdodge())
-
-#BACTERIAL LOAD STATISTICS
-#S.m_resistance <- lm(log(load) ~ secondary_dose + primary + replicate + secondary_dose:primary, data = S.m_bacterial_load)
-#S.m_resistance_anova <- anova(S.m_resistance)
-#S.m_resistance_anova
-```
 
 ## Figure 3A {.tabset}
 Chronic infections with S. marcescens provided protection against mortality following highly lethal secondary infection with P. rettgeri 
 
-### S.marcescens - P.rettgeri Extremes
+### Graph
 ```{r, S.m-P.rett extremes survival data}
 #S.m_P.rett_extremes$primary <- relevel(S.m_P.rett_extremes$primary, "PBS")
-#table(S.m_P.rett_extremes$primary, S.m_P.rett_extremes$secondary_dose)
+table(S.m_P.rett_extremes$primary, S.m_P.rett_extremes$secondary_dose)
 
 #THE GRAPH
 #png(file="S.m_P.rett_extremes.png",width=1200,height=900,res=130)
-par(mar=c(4,5,1,1)) #sets the margins around the graph so there is room for the labels
+par(mar=c(4,5,1,1))
 plot(survfit(Surv(S.m_P.rett_extremes$day, S.m_P.rett_extremes$status) ~ S.m_P.rett_extremes$primary + S.m_P.rett_extremes$secondary_dose), col=c("gray", "#B5E8FC",  "#09B6FC", "#055df5", "#003694", "black"), lty=c(3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1), lwd=5, yaxt='n', xaxt='n', ylab="proportion alive", xlab="days post-secondary infection", cex.lab=2.5, xlim=c(0,7), xaxs='i') 
 axis(2, las=2, cex.axis=1.5, lwd=5)
 axis(1, cex.axis=1.5, lwd=5)
@@ -288,14 +414,119 @@ box(lwd=5)
 #THE LEGEND
 legend("topright",inset=0, bty="n" , c("PBS-PBS", "PBS-P.rett 0.1", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "PBS-P.rett 3.0", "PBS-P.rett 5.0", "S.m-PBS", "S.m-P.rett 0.1", "S.m-P.rett 1.0", "S.m-P.rett 2.0", "S.m-P.rett 3.0", "S.m-P.rett 5.0"),col=c("gray", "#B5E8FC",  "#09B6FC", "#055df5", "#003694", "black"),lty=c(3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1),lwd=5, cex=1)
 
+#dev.off()
+```
+
+### Statistics
+```{r}
 #STATISTICS
 S.m_P.rett_extremes$secondary_dose <- as.factor(S.m_P.rett_extremes$secondary_dose)
 S.m_P.rett_extremes_coxph <- coxph(Surv(day, status) ~ secondary_dose + primary + rep + primary:secondary_dose + rep:secondary_dose + rep:primary, data = S.m_P.rett_extremes)
-summary(S.m_P.rett_extremes_coxph)
-#anova(S.m_P.rett_extremes_coxph)
+anova(S.m_P.rett_extremes_coxph)
 ```
 
-### S.marcescens - P.sneebia
+### Block 1
+```{r, S.m-P.rett extremes survival data 1/30/2020}
+S.m_P.rett_extremes_block1 <- subset(S.m_P.rett_extremes, date == "1/30/2020")
+table(S.m_P.rett_extremes_block1$primary, S.m_P.rett_extremes_block1$secondary_dose)
+
+#THE GRAPH
+par(mar=c(4,5,1,1))
+plot(survfit(Surv(S.m_P.rett_extremes_block1$day, S.m_P.rett_extremes_block1$status) ~ S.m_P.rett_extremes_block1$primary + S.m_P.rett_extremes_block1$secondary_dose), col=c("gray", "#B5E8FC",  "#09B6FC", "#055df5", "black"), lty=c(3, 3, 3, 3, 3, 1, 1, 1, 1, 1), lwd=5, yaxt='n', xaxt='n', ylab="proportion alive", xlab="days post-secondary infection", cex.lab=2.5, xlim=c(0,7), xaxs='i') 
+axis(2, las=2, cex.axis=1.5, lwd=5)
+axis(1, cex.axis=1.5, lwd=5)
+box(lwd=5)
+
+#THE LEGEND
+legend("topright",inset=0, bty="n" , c("PBS-PBS", "PBS-P.rett 0.1", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "PBS-P.rett 5.0", "S.m-PBS", "S.m-P.rett 0.1", "S.m-P.rett 1.0", "S.m-P.rett 2.0", "S.m-P.rett 5.0"),col=c("gray", "#B5E8FC",  "#09B6FC", "#055df5", "black"),lty=c(3, 3, 3, 3, 3, 1, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Block 2
+```{r, S.m-P.rett extremes survival data 2/13/2020}
+S.m_P.rett_extremes_block2 <- subset(S.m_P.rett_extremes, date == "2/13/2020")
+table(S.m_P.rett_extremes_block2$primary, S.m_P.rett_extremes_block2$secondary_dose)
+
+#THE GRAPH
+par(mar=c(4,5,1,1))
+plot(survfit(Surv(S.m_P.rett_extremes_block2$day, S.m_P.rett_extremes_block2$status) ~ S.m_P.rett_extremes_block2$primary + S.m_P.rett_extremes_block2$secondary_dose), col=c("gray", "#B5E8FC",  "#09B6FC", "#055df5", "black"), lty=c(3, 3, 3, 3, 3, 1, 1, 1, 1, 1), lwd=5, yaxt='n', xaxt='n', ylab="proportion alive", xlab="days post-secondary infection", cex.lab=2.5, xlim=c(0,7), xaxs='i') 
+axis(2, las=2, cex.axis=1.5, lwd=5)
+axis(1, cex.axis=1.5, lwd=5)
+box(lwd=5)
+
+#THE LEGEND
+legend("topright",inset=0, bty="n" , c("PBS-PBS", "PBS-P.rett 0.1", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "PBS-P.rett 5.0", "S.m-PBS", "S.m-P.rett 0.1", "S.m-P.rett 1.0", "S.m-P.rett 2.0", "S.m-P.rett 5.0"),col=c("gray", "#B5E8FC",  "#09B6FC", "#055df5", "black"),lty=c(3, 3, 3, 3, 3, 1, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Block 3
+```{r, S.m-P.rett extremes survival data 9/27/2020}
+S.m_P.rett_extremes_block3 <- subset(S.m_P.rett_extremes, date == "9/27/2020")
+table(S.m_P.rett_extremes_block3$primary, S.m_P.rett_extremes_block3$secondary_dose)
+
+#THE GRAPH
+par(mar=c(4,5,1,1))
+plot(survfit(Surv(S.m_P.rett_extremes_block3$day, S.m_P.rett_extremes_block3$status) ~ S.m_P.rett_extremes_block3$primary + S.m_P.rett_extremes_block3$secondary_dose), col=c("gray", "#09B6FC", "#055df5", "#003694", "black"), lty=c(3, 3, 3, 3, 3, 1, 1, 1, 1, 1), lwd=5, yaxt='n', xaxt='n', ylab="proportion alive", xlab="days post-secondary infection", cex.lab=2.5, xlim=c(0,7), xaxs='i') 
+axis(2, las=2, cex.axis=1.5, lwd=5)
+axis(1, cex.axis=1.5, lwd=5)
+box(lwd=5)
+
+#THE LEGEND
+legend("topright",inset=0, bty="n" , c("PBS-PBS", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "PBS-P.rett 3.0", "PBS-P.rett 5.0", "S.m-PBS", "S.m-P.rett 1.0", "S.m-P.rett 2.0", "S.m-P.rett 3.0", "S.m-P.rett 5.0"),col=c("gray", "#09B6FC", "#055df5", "#003694", "black"),lty=c(3, 3, 3, 3, 3, 1, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Block 4
+```{r, S.m-P.rett extremes survival data 10/6/2020}
+S.m_P.rett_extremes_block4 <- subset(S.m_P.rett_extremes, date == "10/6/2020")
+table(S.m_P.rett_extremes_block4$primary, S.m_P.rett_extremes_block4$secondary_dose)
+
+#THE GRAPH
+par(mar=c(4,5,1,1))
+plot(survfit(Surv(S.m_P.rett_extremes_block4$day, S.m_P.rett_extremes_block4$status) ~ S.m_P.rett_extremes_block4$primary + S.m_P.rett_extremes_block4$secondary_dose), col=c("gray", "#09B6FC", "#055df5", "#003694", "black"), lty=c(3, 3, 3, 3, 3, 1, 1, 1, 1, 1), lwd=5, yaxt='n', xaxt='n', ylab="proportion alive", xlab="days post-secondary infection", cex.lab=2.5, xlim=c(0,7), xaxs='i') 
+axis(2, las=2, cex.axis=1.5, lwd=5)
+axis(1, cex.axis=1.5, lwd=5)
+box(lwd=5)
+
+#THE LEGEND
+legend("topright",inset=0, bty="n" , c("PBS-PBS", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "PBS-P.rett 3.0", "PBS-P.rett 5.0", "S.m-PBS", "S.m-P.rett 1.0", "S.m-P.rett 2.0", "S.m-P.rett 3.0", "S.m-P.rett 5.0"),col=c("gray", "#09B6FC", "#055df5", "#003694", "black"),lty=c(3, 3, 3, 3, 3, 1, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Block 5
+```{r, S.m-P.rett extremes survival data 11/1/2020}
+S.m_P.rett_extremes_block5 <- subset(S.m_P.rett_extremes, date == "11/1/2020")
+table(S.m_P.rett_extremes_block5$primary, S.m_P.rett_extremes_block5$secondary_dose)
+
+#THE GRAPH
+par(mar=c(4,5,1,1))
+plot(survfit(Surv(S.m_P.rett_extremes_block5$day, S.m_P.rett_extremes_block5$status) ~ S.m_P.rett_extremes_block5$primary + S.m_P.rett_extremes_block5$secondary_dose), col=c("gray", "#09B6FC", "#055df5", "#003694", "black"), lty=c(3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1), lwd=5, yaxt='n', xaxt='n', ylab="proportion alive", xlab="days post-secondary infection", cex.lab=2.5, xlim=c(0,7), xaxs='i') 
+axis(2, las=2, cex.axis=1.5, lwd=5)
+axis(1, cex.axis=1.5, lwd=5)
+box(lwd=5)
+
+#THE LEGEND
+legend("topright",inset=0, bty="n" , c("PBS-PBS", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "PBS-P.rett 3.0", "PBS-P.rett 5.0", "S.m-PBS", "S.m-P.rett 1.0", "S.m-P.rett 2.0", "S.m-P.rett 3.0", "S.m-P.rett 5.0"),col=c("gray", "#09B6FC", "#055df5", "#003694", "black"),lty=c(3, 3, 3, 3, 3, 1, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Block 6
+```{r, S.m-P.rett extremes survival data 6/16/2021}
+S.m_P.rett_extremes_block6 <- subset(S.m_P.rett_extremes, date == "6/16/2021")
+table(S.m_P.rett_extremes_block6$primary, S.m_P.rett_extremes_block6$secondary_dose)
+
+#THE GRAPH
+par(mar=c(4,5,1,1))
+plot(survfit(Surv(S.m_P.rett_extremes_block6$day, S.m_P.rett_extremes_block6$status) ~ S.m_P.rett_extremes_block6$primary + S.m_P.rett_extremes_block6$secondary_dose), col=c("gray", "#09B6FC", "#055df5", "#003694", "black"), lty=c(3, 3, 3, 3, 3, 1, 1, 1, 1, 1), lwd=5, yaxt='n', xaxt='n', ylab="proportion alive", xlab="days post-secondary infection", cex.lab=2.5, xlim=c(0,7), xaxs='i') 
+axis(2, las=2, cex.axis=1.5, lwd=5)
+axis(1, cex.axis=1.5, lwd=5)
+box(lwd=5)
+
+#THE LEGEND
+legend("topright",inset=0, bty="n" , c("PBS-PBS", "PBS-P.rett 1.0", "PBS-P.rett 2.0", "PBS-P.rett 3.0", "PBS-P.rett 5.0", "S.m-PBS", "S.m-P.rett 1.0", "S.m-P.rett 2.0", "S.m-P.rett 3.0", "S.m-P.rett 5.0"),col=c("gray", "#09B6FC", "#055df5", "#003694", "black"),lty=c(3, 3, 3, 3, 3, 1, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+
+## Figure 3B {.tabset}
+Things
+
+### Graph
+Mortality following secondary infection with P. rettgeri in flies chronically infected with S. marcescens versus control flies not given a chronic infection. Flies chronically infected with S. marcescens were more likely to survive various doses of secondary infection with P. sneebia (p < 0.0001).
 ```{r, S.m-P.snee survival data}
 #table(S.m_P.snee$primary, S.m_P.snee$secondary_dose)
 
@@ -311,41 +542,223 @@ legend("bottomleft", bty="n" , c("PBS-PBS", "0.001", "PBS-0.01", "PBS-0.1", "PBS
 #STATISTICS
 S.m_P.snee$secondary_dose <- as.factor(S.m_P.snee$secondary_dose)
 S.m_P.snee_coxph <- coxph(Surv(day, status) ~ secondary_dose + primary + rep + primary:secondary_dose + rep:secondary_dose + rep:primary, data = S.m_P.snee)
-summary(S.m_P.snee_coxph)
-#anova(S.m_P.snee_coxph)
+#summary(S.m_P.snee_coxph)
+anova(S.m_P.snee_coxph)
 ```
 
-## Figure 4 {.tabset}
+### Block 1
+```{r, S.m-P.snee 10/1/2020}
+S.m_P.snee_block1 <- subset(S.m_P.snee, date == "10/1/2020")
+table(S.m_P.snee_block1$primary, S.m_P.snee_block1$secondary_dose)
+
+
+plot(survfit(Surv(S.m_P.snee_block1$hour, S.m_P.snee_block1$status) ~ S.m_P.snee_block1$primary + S.m_P.snee_block1$secondary_dose), col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5"), lty=c(3, 3, 3, 3, 3, 1, 1, 1, 1, 1), lwd=2.3, yaxt='n', xaxt='n', ylab="Proportion Alive", xlab="Hours Post-Secondary Infection", cex.lab=1.3, xlim=c(10,48), xaxs='i', ylim=c(0, 1.05), yaxs='i') 
+axis(2, las=2, cex.axis=1, lwd=4.5) 
+axis(1, cex.axis=1, lwd=4.5)
+box(lwd=4.5)
+
+legend("bottomleft", bty="n" , c("PBS-PBS", "0.001", "PBS-0.01", "PBS-0.1", "PBS-1.0", "S.m-PBS", "S.m-0.001", "S.m-0.01", "S.m-0.1", "S.m-1.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5"), lty=c(3, 3, 3, 3, 3, 1, 1, 1, 1, 1),lwd=4, cex=1)
+```
+
+### Block 2
+```{r, S.m-P.snee 10/10/2020}
+S.m_P.snee_block2 <- subset(S.m_P.snee, date == "10/10/2020")
+table(S.m_P.snee_block2$primary, S.m_P.snee_block2$secondary_dose)
+
+
+plot(survfit(Surv(S.m_P.snee_block2$hour, S.m_P.snee_block2$status) ~ S.m_P.snee_block2$primary + S.m_P.snee_block2$secondary_dose), col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5"), lty=c(3, 3, 3, 3, 3, 1, 1, 1, 1, 1), lwd=2.3, yaxt='n', xaxt='n', ylab="Proportion Alive", xlab="Hours Post-Secondary Infection", cex.lab=1.3, xlim=c(10,48), xaxs='i', ylim=c(0, 1.05), yaxs='i') 
+axis(2, las=2, cex.axis=1, lwd=4.5) 
+axis(1, cex.axis=1, lwd=4.5)
+box(lwd=4.5)
+
+legend("bottomleft", bty="n" , c("PBS-PBS", "0.001", "PBS-0.01", "PBS-0.1", "PBS-1.0", "S.m-PBS", "S.m-0.001", "S.m-0.01", "S.m-0.1", "S.m-1.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5"), lty=c(3, 3, 3, 3, 3, 1, 1, 1, 1, 1),lwd=4, cex=1)
+```
+
+### Block 3
+```{r, S.m-P.snee 10/24/2020}
+S.m_P.snee_block3 <- subset(S.m_P.snee, date == "10/24/2020")
+table(S.m_P.snee_block3$primary, S.m_P.snee_block3$secondary_dose)
+
+plot(survfit(Surv(S.m_P.snee_block3$hour, S.m_P.snee_block3$status) ~ S.m_P.snee_block3$primary + S.m_P.snee_block3$secondary_dose), col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5"), lty=c(3, 3, 3, 3, 3, 1, 1, 1, 1, 1), lwd=2.3, yaxt='n', xaxt='n', ylab="Proportion Alive", xlab="Hours Post-Secondary Infection", cex.lab=1.3, xlim=c(10,48), xaxs='i', ylim=c(0, 1.05), yaxs='i') 
+axis(2, las=2, cex.axis=1, lwd=4.5) 
+axis(1, cex.axis=1, lwd=4.5)
+box(lwd=4.5)
+
+legend("bottomleft", bty="n" , c("PBS-PBS", "0.001", "PBS-0.01", "PBS-0.1", "PBS-1.0", "S.m-PBS", "S.m-0.001", "S.m-0.01", "S.m-0.1", "S.m-1.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5"), lty=c(3, 3, 3, 3, 3, 1, 1, 1, 1, 1),lwd=4, cex=1)
+```
+
+
+## Figure 4A {.tabset}
 Text here 
 
-### S.marcescens - P.rettgeri
+### Graph
 ```{r, S.m-P.rett varied primary survival data}
 P.rett_varied_primary = subset(P.rett_varied_primary, secondary == "P.rett")
-table(P.rett_varied_primary$primary_dose)
 P.rett_varied_primary$primary_dose <- as.factor(P.rett_varied_primary$primary_dose)
 
-png(file="P.rett_varied_primary_no_legend.png",  width = 1700, height = 1500, res = 300)
+#png(file="P.rett_varied_primary_no_legend.png",  width = 1700, height = 1500, res = 300)
 par(mar=c(4,4,0.1,0.1)) #sets the margins around the graph so there is room for the labels
 plot(survfit(Surv(P.rett_varied_primary$day, P.rett_varied_primary$status) ~ P.rett_varied_primary$primary_dose), col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"), lty=c(1, 1, 1, 1, 1, 1), lwd=3.4, yaxt='n', xaxt='n', ylab="Proportion Alive", xlab="Days Post-Secondary Infection", cex.lab=1.3, xlim=c(0,7), xaxs='i', ylim=c(0, 1.05), yaxs='i')  
 axis(2, las=2, cex.axis=1, lwd=4.5) 
 axis(1, cex.axis=1, lwd=4.5)
 box(lwd=4.5)
 
-#legend("bottomleft", bty="n" , c("PBS-P.rett 2.0", "S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0-P.rett 2.0", "S.m 2.0-P.rett 2.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"),lty=c(1, 1, 1, 1, 1, 1),lwd=5, cex=1)
+legend("bottomleft", bty="n" , c("PBS-P.rett 2.0", "S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0-P.rett 2.0", "S.m 2.0-P.rett 2.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"),lty=c(1, 1, 1, 1, 1, 1),lwd=5, cex=1)
 
 #STATISTICS
 #Generate a Cox proportional Hazards model which assesses the contribution of infectious dose while controlling for replicate
-table(P.rett_varied_primary$rep, P.rett_varied_primary$primary_dose)
 P.rett_varied_primary_coxph <- coxph(Surv(day, status) ~ primary_dose, data = P.rett_varied_primary)
-summary(P.rett_varied_primary_coxph)
-#anova(P.rett_varied_primary_coxph)
+#summary(P.rett_varied_primary_coxph)
+anova(P.rett_varied_primary_coxph)
 ```
+
+### Block 1
+```{r, S.m-P.rett varied primary 10/18/2020}
+P.rett_varied_primary_block1 <- subset(P.rett_varied_primary, date == "10/18/2020")
+table(P.rett_varied_primary_block1$primary_dose)
+
+par(mar=c(4,4,0.1,0.1))
+plot(survfit(Surv(P.rett_varied_primary_block1$day, P.rett_varied_primary_block1$status) ~ P.rett_varied_primary_block1$primary_dose), col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"), lty=c(1, 1, 1, 1, 1, 1), lwd=3.4, yaxt='n', xaxt='n', ylab="Proportion Alive", xlab="Days Post-Secondary Infection", cex.lab=1.3, xlim=c(0,7), xaxs='i', ylim=c(0, 1.05), yaxs='i')  
+axis(2, las=2, cex.axis=1, lwd=4.5) 
+axis(1, cex.axis=1, lwd=4.5)
+box(lwd=4.5)
+
+legend("bottomleft", bty="n" , c("PBS-P.rett 2.0", "S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0-P.rett 2.0", "S.m 2.0-P.rett 2.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"),lty=c(1, 1, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Block 2
+```{r, S.m-P.rett varied primary 10/20/2020}
+P.rett_varied_primary_block2 <- subset(P.rett_varied_primary, date == "10/20/2020")
+table(P.rett_varied_primary_block2$primary_dose)
+
+par(mar=c(4,4,0.1,0.1))
+plot(survfit(Surv(P.rett_varied_primary_block2$day, P.rett_varied_primary_block2$status) ~ P.rett_varied_primary_block2$primary_dose), col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"), lty=c(1, 1, 1, 1, 1, 1), lwd=3.4, yaxt='n', xaxt='n', ylab="Proportion Alive", xlab="Days Post-Secondary Infection", cex.lab=1.3, xlim=c(0,7), xaxs='i', ylim=c(0, 1.05), yaxs='i')  
+axis(2, las=2, cex.axis=1, lwd=4.5) 
+axis(1, cex.axis=1, lwd=4.5)
+box(lwd=4.5)
+
+legend("bottomleft", bty="n" , c("PBS-P.rett 2.0", "S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0-P.rett 2.0", "S.m 2.0-P.rett 2.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"),lty=c(1, 1, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Block 3
+```{r, S.m-P.rett varied primary 10/29/2020}
+P.rett_varied_primary_block3 <- subset(P.rett_varied_primary, date == "10/29/2020")
+table(P.rett_varied_primary_block3$primary_dose)
+
+par(mar=c(4,4,0.1,0.1))
+plot(survfit(Surv(P.rett_varied_primary_block3$day, P.rett_varied_primary_block3$status) ~ P.rett_varied_primary_block3$primary_dose), col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"), lty=c(1, 1, 1, 1, 1, 1), lwd=3.4, yaxt='n', xaxt='n', ylab="Proportion Alive", xlab="Days Post-Secondary Infection", cex.lab=1.3, xlim=c(0,7), xaxs='i', ylim=c(0, 1.05), yaxs='i')  
+axis(2, las=2, cex.axis=1, lwd=4.5) 
+axis(1, cex.axis=1, lwd=4.5)
+box(lwd=4.5)
+
+legend("bottomleft", bty="n" , c("PBS-P.rett 2.0", "S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0-P.rett 2.0", "S.m 2.0-P.rett 2.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"),lty=c(1, 1, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Block 4
+```{r, S.m-P.rett varied primary 11/2/2020}
+P.rett_varied_primary_block4 <- subset(P.rett_varied_primary, date == "11/2/2020")
+table(P.rett_varied_primary_block4$primary_dose)
+
+par(mar=c(4,4,0.1,0.1))
+plot(survfit(Surv(P.rett_varied_primary_block4$day, P.rett_varied_primary_block4$status) ~ P.rett_varied_primary_block4$primary_dose), col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"), lty=c(1, 1, 1, 1, 1, 1), lwd=3.4, yaxt='n', xaxt='n', ylab="Proportion Alive", xlab="Days Post-Secondary Infection", cex.lab=1.3, xlim=c(0,7), xaxs='i', ylim=c(0, 1.05), yaxs='i')  
+axis(2, las=2, cex.axis=1, lwd=4.5) 
+axis(1, cex.axis=1, lwd=4.5)
+box(lwd=4.5)
+
+legend("bottomleft", bty="n" , c("PBS-P.rett 2.0", "S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0-P.rett 2.0", "S.m 2.0-P.rett 2.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"),lty=c(1, 1, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Block 5
+```{r, S.m-P.rett varied primary 11/7/2020}
+P.rett_varied_primary_block5 <- subset(P.rett_varied_primary, date == "11/7/2020")
+table(P.rett_varied_primary_block5$primary_dose)
+
+par(mar=c(4,4,0.1,0.1))
+plot(survfit(Surv(P.rett_varied_primary_block5$day, P.rett_varied_primary_block5$status) ~ P.rett_varied_primary_block5$primary_dose), col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"), lty=c(1, 1, 1, 1, 1, 1), lwd=3.4, yaxt='n', xaxt='n', ylab="Proportion Alive", xlab="Days Post-Secondary Infection", cex.lab=1.3, xlim=c(0,7), xaxs='i', ylim=c(0, 1.05), yaxs='i')  
+axis(2, las=2, cex.axis=1, lwd=4.5) 
+axis(1, cex.axis=1, lwd=4.5)
+box(lwd=4.5)
+
+legend("bottomleft", bty="n" , c("PBS-P.rett 2.0", "S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0-P.rett 2.0", "S.m 2.0-P.rett 2.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"),lty=c(1, 1, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Block 6
+```{r, S.m-P.rett varied primary 11/28/2020}
+P.rett_varied_primary_block6 <- subset(P.rett_varied_primary, date == "11/28/2020")
+table(P.rett_varied_primary_block6$primary_dose)
+
+par(mar=c(4,4,0.1,0.1))
+plot(survfit(Surv(P.rett_varied_primary_block6$day, P.rett_varied_primary_block6$status) ~ P.rett_varied_primary_block6$primary_dose), col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"), lty=c(1, 1, 1, 1, 1, 1), lwd=3.4, yaxt='n', xaxt='n', ylab="Proportion Alive", xlab="Days Post-Secondary Infection", cex.lab=1.3, xlim=c(0,7), xaxs='i', ylim=c(0, 1.05), yaxs='i')  
+axis(2, las=2, cex.axis=1, lwd=4.5) 
+axis(1, cex.axis=1, lwd=4.5)
+box(lwd=4.5)
+
+legend("bottomleft", bty="n" , c("PBS-P.rett 2.0", "S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0-P.rett 2.0", "S.m 2.0-P.rett 2.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"),lty=c(1, 1, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Block 7
+```{r, S.m-P.rett varied primary 11/30/2020}
+P.rett_varied_primary_block7 <- subset(P.rett_varied_primary, date == "11/30/2020")
+table(P.rett_varied_primary_block7$primary_dose)
+
+par(mar=c(4,4,0.1,0.1))
+plot(survfit(Surv(P.rett_varied_primary_block7$day, P.rett_varied_primary_block7$status) ~ P.rett_varied_primary_block7$primary_dose), col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"), lty=c(1, 1, 1, 1, 1, 1), lwd=3.4, yaxt='n', xaxt='n', ylab="Proportion Alive", xlab="Days Post-Secondary Infection", cex.lab=1.3, xlim=c(0,7), xaxs='i', ylim=c(0, 1.05), yaxs='i')  
+axis(2, las=2, cex.axis=1, lwd=4.5) 
+axis(1, cex.axis=1, lwd=4.5)
+box(lwd=4.5)
+
+legend("bottomleft", bty="n" , c("PBS-P.rett 2.0", "S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0-P.rett 2.0", "S.m 2.0-P.rett 2.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"),lty=c(1, 1, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Block 8
+```{r, S.m-P.rett varied primary 12/4/2020}
+P.rett_varied_primary_block8 <- subset(P.rett_varied_primary, date == "12/4/2020")
+table(P.rett_varied_primary_block8$primary_dose)
+
+par(mar=c(4,4,0.1,0.1))
+plot(survfit(Surv(P.rett_varied_primary_block8$day, P.rett_varied_primary_block8$status) ~ P.rett_varied_primary_block8$primary_dose), col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"), lty=c(1, 1, 1, 1, 1, 1), lwd=3.4, yaxt='n', xaxt='n', ylab="Proportion Alive", xlab="Days Post-Secondary Infection", cex.lab=1.3, xlim=c(0,7), xaxs='i', ylim=c(0, 1.05), yaxs='i')  
+axis(2, las=2, cex.axis=1, lwd=4.5) 
+axis(1, cex.axis=1, lwd=4.5)
+box(lwd=4.5)
+
+legend("bottomleft", bty="n" , c("PBS-P.rett 2.0", "S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0-P.rett 2.0", "S.m 2.0-P.rett 2.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"),lty=c(1, 1, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Block 9
+```{r, S.m-P.rett varied primary 6/17/2021}
+P.rett_varied_primary_block9 <- subset(P.rett_varied_primary, date == "6/17/2021")
+table(P.rett_varied_primary_block9$primary_dose)
+
+par(mar=c(4,4,0.1,0.1))
+plot(survfit(Surv(P.rett_varied_primary_block9$day, P.rett_varied_primary_block9$status) ~ P.rett_varied_primary_block9$primary_dose), col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"), lty=c(1, 1, 1, 1, 1, 1), lwd=3.4, yaxt='n', xaxt='n', ylab="Proportion Alive", xlab="Days Post-Secondary Infection", cex.lab=1.3, xlim=c(0,7), xaxs='i', ylim=c(0, 1.05), yaxs='i')  
+axis(2, las=2, cex.axis=1, lwd=4.5) 
+axis(1, cex.axis=1, lwd=4.5)
+box(lwd=4.5)
+
+legend("bottomleft", bty="n" , c("PBS-P.rett 2.0", "S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0-P.rett 2.0", "S.m 2.0-P.rett 2.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"),lty=c(1, 1, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Block 10
+```{r, S.m-P.rett varied primary 6/18/2021}
+P.rett_varied_primary_block10 <- subset(P.rett_varied_primary, date == "6/18/2021")
+table(P.rett_varied_primary_block10$primary_dose)
+
+par(mar=c(4,4,0.1,0.1))
+plot(survfit(Surv(P.rett_varied_primary_block10$day, P.rett_varied_primary_block10$status) ~ P.rett_varied_primary_block10$primary_dose), col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"), lty=c(1, 1, 1, 1, 1, 1), lwd=3.4, yaxt='n', xaxt='n', ylab="Proportion Alive", xlab="Days Post-Secondary Infection", cex.lab=1.3, xlim=c(0,7), xaxs='i', ylim=c(0, 1.05), yaxs='i')  
+axis(2, las=2, cex.axis=1, lwd=4.5) 
+axis(1, cex.axis=1, lwd=4.5)
+box(lwd=4.5)
+
+legend("bottomleft", bty="n" , c("PBS-P.rett 2.0", "S.m 0.001-P.rett 2.0", "S.m 0.01-P.rett 2.0", "S.m 0.1-P.rett 2.0", "S.m 1.0-P.rett 2.0", "S.m 2.0-P.rett 2.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"),lty=c(1, 1, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+## Figure 4B {.tabset}
+words
 
 ### S.marcescens - P.sneebia
 ```{r, S.m-P.snee varied primary survival data}
 P.snee_varied_primary <- subset(P.snee_varied_primary, secondary == "P.snee")
-droplevels(P.snee_varied_primary)
-#table(P.snee_varied_primary$rep, P.snee_varied_primary$primary_dose)
+table(P.snee_varied_primary$date, P.snee_varied_primary$primary_dose)
 
 #png(file="P.snee_varied_primary.png",  width = 1700, height = 1500, res = 300)
 #par(mar=c(4,4,0.1,0.1)) #sets the margins around the graph so there is room for the labels
@@ -362,6 +775,84 @@ legend("bottomleft", bty="n" , c("PBS-P.snee 2.0", "S.m 0.001-P.snee 2.0", "S.m 
 P.snee_varied_primary$primary <- as.factor(P.snee_varied_primary$primary)
 P.snee_varied_primary$primary_dose <- as.factor(P.snee_varied_primary$primary_dose)
 P.snee_varied_primary_coxph <- coxph(Surv(hour, status) ~ primary_dose, data = P.snee_varied_primary)
-summary(P.snee_varied_primary_coxph)
+#summary(P.snee_varied_primary_coxph)
 anova(P.snee_varied_primary_coxph)
+```
+
+### Block 1
+```{r, P.snee varied primary 3/10/2021}
+P.snee_varied_primary_block1 <- subset(P.snee_varied_primary, date == "3/10/2021")
+table(P.snee_varied_primary$primary_dose)
+
+plot(survfit(Surv(P.snee_varied_primary_block1$hour, P.snee_varied_primary_block1$status) ~ P.snee_varied_primary_block1$condition), col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"), lty=c(1, 1, 1, 1, 1, 1), lwd=3.4, yaxt='n', xaxt='n', ylab="Proportion Alive", xlab="Hours Post-Secondary Infection", cex.lab=1.3, xlim=c(10,48), xaxs='i', ylim=c(0, 1.05), yaxs='i')  
+axis(2, las=2, cex.axis=1, lwd=4.5) 
+axis(1, cex.axis=1, lwd=4.5)
+box(lwd=4.5)
+
+legend("bottomleft", bty="n" , c("PBS-P.snee 2.0", "S.m 0.001-P.snee 2.0", "S.m 0.01-P.snee 2.0", "S.m 0.1-P.snee 2.0", "S.m 1.0-P.snee 2.0", "S.m 2.0-P.snee 2.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"),lty=c(1, 1, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Block 2
+```{r, P.snee varied primary 3/17/2021}
+P.snee_varied_primary_block2 <- subset(P.snee_varied_primary, date == "3/17/2021")
+table(P.snee_varied_primary_block2$primary_dose)
+
+plot(survfit(Surv(P.snee_varied_primary_block2$hour, P.snee_varied_primary_block2$status) ~ P.snee_varied_primary_block2$condition), col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"), lty=c(1, 1, 1, 1, 1, 1), lwd=3.4, yaxt='n', xaxt='n', ylab="Proportion Alive", xlab="Hours Post-Secondary Infection", cex.lab=1.3, xlim=c(10,48), xaxs='i', ylim=c(0, 1.05), yaxs='i')  
+axis(2, las=2, cex.axis=1, lwd=4.5) 
+axis(1, cex.axis=1, lwd=4.5)
+box(lwd=4.5)
+
+legend("bottomleft", bty="n" , c("PBS-P.snee 2.0", "S.m 0.001-P.snee 2.0", "S.m 0.01-P.snee 2.0", "S.m 0.1-P.snee 2.0", "S.m 1.0-P.snee 2.0", "S.m 2.0-P.snee 2.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"),lty=c(1, 1, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Block 3
+```{r, P.snee varied primary 3/31/2021}
+P.snee_varied_primary_block3 <- subset(P.snee_varied_primary, date == "3/31/2021")
+table(P.snee_varied_primary_block3$primary_dose)
+
+plot(survfit(Surv(P.snee_varied_primary_block3$hour, P.snee_varied_primary_block3$status) ~ P.snee_varied_primary_block3$condition), col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"), lty=c(1, 1, 1, 1, 1, 1), lwd=3.4, yaxt='n', xaxt='n', ylab="Proportion Alive", xlab="Hours Post-Secondary Infection", cex.lab=1.3, xlim=c(10,48), xaxs='i', ylim=c(0, 1.05), yaxs='i')  
+axis(2, las=2, cex.axis=1, lwd=4.5) 
+axis(1, cex.axis=1, lwd=4.5)
+box(lwd=4.5)
+
+legend("bottomleft", bty="n" , c("PBS-P.snee 2.0", "S.m 0.001-P.snee 2.0", "S.m 0.01-P.snee 2.0", "S.m 0.1-P.snee 2.0", "S.m 1.0-P.snee 2.0", "S.m 2.0-P.snee 2.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"),lty=c(1, 1, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Block 4
+```{r, P.snee varied primary 4/21/2021}
+P.snee_varied_primary_block4 <- subset(P.snee_varied_primary, date == "4/21/2021")
+table(P.snee_varied_primary_block4$primary_dose)
+
+plot(survfit(Surv(P.snee_varied_primary_block4$hour, P.snee_varied_primary_block4$status) ~ P.snee_varied_primary_block4$condition), col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"), lty=c(1, 1, 1, 1, 1, 1), lwd=3.4, yaxt='n', xaxt='n', ylab="Proportion Alive", xlab="Hours Post-Secondary Infection", cex.lab=1.3, xlim=c(10,48), xaxs='i', ylim=c(0, 1.05), yaxs='i')  
+axis(2, las=2, cex.axis=1, lwd=4.5) 
+axis(1, cex.axis=1, lwd=4.5)
+box(lwd=4.5)
+
+legend("bottomleft", bty="n" , c("PBS-P.snee 2.0", "S.m 0.001-P.snee 2.0", "S.m 0.01-P.snee 2.0", "S.m 0.1-P.snee 2.0", "S.m 1.0-P.snee 2.0", "S.m 2.0-P.snee 2.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"),lty=c(1, 1, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Block 5
+```{r, P.snee varied primary 4/28/2021}
+P.snee_varied_primary_block4 <- subset(P.snee_varied_primary, date == "4/28/2021")
+table(P.snee_varied_primary_block4$primary_dose)
+
+plot(survfit(Surv(P.snee_varied_primary_block4$hour, P.snee_varied_primary_block4$status) ~ P.snee_varied_primary_block4$condition), col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"), lty=c(1, 1, 1, 1, 1, 1), lwd=3.4, yaxt='n', xaxt='n', ylab="Proportion Alive", xlab="Hours Post-Secondary Infection", cex.lab=1.3, xlim=c(10,48), xaxs='i', ylim=c(0, 1.05), yaxs='i')  
+axis(2, las=2, cex.axis=1, lwd=4.5) 
+axis(1, cex.axis=1, lwd=4.5)
+box(lwd=4.5)
+
+legend("bottomleft", bty="n" , c("PBS-P.snee 2.0", "S.m 0.001-P.snee 2.0", "S.m 0.01-P.snee 2.0", "S.m 0.1-P.snee 2.0", "S.m 1.0-P.snee 2.0", "S.m 2.0-P.snee 2.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"),lty=c(1, 1, 1, 1, 1, 1),lwd=5, cex=1)
+```
+
+### Block 6
+```{r, P.snee varied primary 6/20/2021}
+P.snee_varied_primary_block6 <- subset(P.snee_varied_primary, date == "6/20/2021")
+table(P.snee_varied_primary_block6$primary_dose)
+
+plot(survfit(Surv(P.snee_varied_primary_block6$hour, P.snee_varied_primary_block6$status) ~ P.snee_varied_primary_block6$condition), col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"), lty=c(1, 1, 1, 1, 1, 1), lwd=3.4, yaxt='n', xaxt='n', ylab="Proportion Alive", xlab="Hours Post-Secondary Infection", cex.lab=1.3, xlim=c(10,48), xaxs='i', ylim=c(0, 1.05), yaxs='i')  
+axis(2, las=2, cex.axis=1, lwd=4.5) 
+axis(1, cex.axis=1, lwd=4.5)
+box(lwd=4.5)
+
+legend("bottomleft", bty="n" , c("PBS-P.snee 2.0", "S.m 0.001-P.snee 2.0", "S.m 0.01-P.snee 2.0", "S.m 0.1-P.snee 2.0", "S.m 1.0-P.snee 2.0", "S.m 2.0-P.snee 2.0"),col=c("gray", "#B5E8FC", "#75D6FD", "#09B6FC", "#055df5", "#003694"),lty=c(1, 1, 1, 1, 1, 1),lwd=5, cex=1)
 ```
